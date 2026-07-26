@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+-<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -220,6 +220,10 @@
   .tab-item .del-tab{ opacity:0; font-size:12px; color:var(--ink-soft); cursor:pointer; padding:2px 5px; }
   .tab-item:hover .del-tab{ opacity:0.55; }
   .tab-item .del-tab:hover{ opacity:1; color:var(--terracotta); }
+  .tab-item .share-tab{ opacity:0; font-size:12.5px; color:var(--ink-soft); cursor:pointer; padding:2px 4px; }
+  .tab-item:hover .share-tab{ opacity:0.55; }
+  .tab-item .share-tab:hover{ opacity:1; color:var(--dusty); }
+  .tab-item .shared-badge{ font-size:11px; flex-shrink:0; }
 
   .add-tab-btn{
     margin-top:4px;
@@ -507,7 +511,7 @@
 
       <div class="footer-bar">
         <span id="wordCount">0자 · 0단어</span>
-        <span>1. 로 번호 목록 · - 로 글머리 목록 · [] 로 체크박스 · 이미지는 파일 업로드나 Ctrl+V로 붙여넣기</span>
+        <span>탭 옆 🔗를 누르면 다른 사람과 공유해서 함께 편집할 수 있어요</span>
       </div>
     </div>
   </div>
@@ -630,7 +634,12 @@
   function scheduleSave(){
     clearTimeout(saveTimer);
     setSaveStatus('saving');
-    saveTimer = setTimeout(()=>{ saveTimer = null; saveProfile(); }, 600);
+    saveTimer = setTimeout(async ()=>{
+      saveTimer = null;
+      await saveProfile();
+      const tab = profile ? getActiveTab() : null;
+      if(tab && tab.shared) await saveSharedTab(tab);
+    }, 600);
   }
 
   function isEditingNow(){
@@ -674,6 +683,179 @@
     fbUnsub = ()=> ref.off('value', handler);
   }
   function detachRealtimeListener(){ if(fbUnsub){ fbUnsub(); fbUnsub = null; } }
+
+  // ---------- note sharing ----------
+  async function writeSharedNode(shareId, payload){
+    if(STORAGE_MODE === 'firebase'){
+      await fbDb.ref('tamgu-shared/' + shareId).set(payload);
+    } else if(STORAGE_MODE === 'claude'){
+      await window.storage.set('tamgu-shared:' + shareId, JSON.stringify(payload), true);
+    } else {
+      throw new Error('공유는 Firebase 또는 Claude 저장소가 있어야 가능해요');
+    }
+  }
+
+  async function readSharedNode(shareId){
+    try{
+      if(STORAGE_MODE === 'firebase'){
+        const snap = await fbDb.ref('tamgu-shared/' + shareId).once('value');
+        return snap.exists() ? snap.val() : null;
+      }
+      if(STORAGE_MODE === 'claude'){
+        const res = await window.storage.get('tamgu-shared:' + shareId, true);
+        return (res && res.value) ? JSON.parse(res.value) : null;
+      }
+    }catch(e){ console.error('공유 노트 불러오기 실패', e); }
+    return null;
+  }
+
+  async function writeInboxEntry(recipientName, shareId, title, fromName){
+    const entry = { shareId, fromName, title: title || '제목 없는 조사', sharedAt: Date.now() };
+    if(STORAGE_MODE === 'firebase'){
+      await fbDb.ref('tamgu-inbox/' + docIdFor(recipientName) + '/' + shareId).set(entry);
+    } else if(STORAGE_MODE === 'claude'){
+      const key = 'tamgu-inbox:' + recipientName;
+      let list = [];
+      try{ const res = await window.storage.get(key, true); if(res && res.value) list = JSON.parse(res.value); }catch(e){}
+      list.push(entry);
+      await window.storage.set(key, JSON.stringify(list), true);
+    }
+  }
+
+  async function saveSharedTab(tab){
+    if(!tab || !tab.shared) return;
+    try{
+      const updatedAt = Date.now();
+      const payload = {
+        title: tab.title || '',
+        blocks: tab.blocks,
+        color: tab.color,
+        owner: tab.shared.owner,
+        collaborators: tab.shared.collaborators,
+        updatedAt
+      };
+      await writeSharedNode(tab.shared.shareId, payload);
+      tab._lastKnownUpdatedAt = updatedAt;
+    }catch(e){ console.error('공유 노트 저장 실패', e); }
+  }
+
+  async function shareTab(tab){
+    if(STORAGE_MODE === 'local'){
+      showToast('공유하려면 먼저 저장소(Firebase)를 연결해주세요');
+      return;
+    }
+    const input = prompt('누구와 이 조사를 공유할까요? 상대방이 쓰는 이름을 적어주세요');
+    if(!input) return;
+    const recipientName = input.trim();
+    if(!recipientName) return;
+    if(recipientName === profile.name){ showToast('본인과는 공유할 수 없어요'); return; }
+
+    let shareId, collaborators, owner;
+    if(tab.shared){
+      shareId = tab.shared.shareId;
+      owner = tab.shared.owner;
+      collaborators = Array.from(new Set([...(tab.shared.collaborators||[]), recipientName]));
+    } else {
+      shareId = uid();
+      owner = profile.name;
+      collaborators = [profile.name, recipientName];
+    }
+
+    try{
+      const updatedAt = Date.now();
+      await writeSharedNode(shareId, {
+        title: tab.title || '', blocks: tab.blocks, color: tab.color,
+        owner, collaborators, updatedAt
+      });
+      await writeInboxEntry(recipientName, shareId, tab.title, profile.name);
+      tab.shared = { shareId, owner, collaborators };
+      tab._lastKnownUpdatedAt = updatedAt;
+      renderTabs();
+      scheduleSave();
+      showToast(recipientName + '님에게 공유했어요');
+    }catch(e){
+      console.error(e);
+      showToast('공유에 실패했어요');
+    }
+  }
+
+  async function processIncomingShare(entry){
+    if(!entry || !entry.shareId || !profile) return;
+    if(profile.tabs.find(t => t.shared && t.shared.shareId === entry.shareId)) return; // already added
+    const fresh = await readSharedNode(entry.shareId);
+    const stub = {
+      id: uid(),
+      name: entry.title || '공유된 조사',
+      color: (fresh && fresh.color) || SWATCH_COLORS[Math.floor(Math.random()*SWATCH_COLORS.length)],
+      title: (fresh && fresh.title) || entry.title || '',
+      createdAt: new Date().toISOString().slice(0,10),
+      blocks: (fresh && fresh.blocks) || [ newBlock(0,'text','') ],
+      shared: {
+        shareId: entry.shareId,
+        owner: (fresh && fresh.owner) || entry.fromName,
+        collaborators: (fresh && fresh.collaborators) || [entry.fromName, profile.name]
+      },
+      _lastKnownUpdatedAt: (fresh && fresh.updatedAt) || 0
+    };
+    profile.tabs.push(stub);
+    renderTabs();
+    scheduleSave();
+    showToast((entry.fromName || '상대방') + '님이 "' + (stub.title || '제목 없는 조사') + '" 노트를 공유했어요 — 함께 편집할 수 있어요');
+  }
+
+  let inboxUnsub = null;
+  function attachInboxListener(){
+    if(!profile) return;
+    detachInboxListener();
+    if(STORAGE_MODE === 'firebase'){
+      const ref = fbDb.ref('tamgu-inbox/' + docIdFor(profile.name));
+      const handler = (snap)=>{
+        const key = snap.key;
+        const entry = snap.val();
+        processIncomingShare(entry).then(()=> ref.child(key).remove());
+      };
+      ref.on('child_added', handler);
+      inboxUnsub = ()=> ref.off('child_added', handler);
+    }
+    // claude-mode inbox is checked via checkInboxPollClaude() on the regular poll interval
+  }
+  function detachInboxListener(){ if(inboxUnsub){ inboxUnsub(); inboxUnsub = null; } }
+
+  async function checkInboxPollClaude(){
+    if(STORAGE_MODE !== 'claude' || !profile) return;
+    try{
+      const key = 'tamgu-inbox:' + profile.name;
+      const res = await window.storage.get(key, true);
+      if(!res || !res.value) return;
+      const list = JSON.parse(res.value);
+      if(!list.length) return;
+      for(const entry of list){ await processIncomingShare(entry); }
+      await window.storage.set(key, JSON.stringify([]), true);
+    }catch(e){}
+  }
+
+  let activeSharedUnsub = null;
+  function attachActiveSharedListener(tab){
+    if(STORAGE_MODE !== 'firebase' || !tab || !tab.shared) return;
+    detachActiveSharedListener();
+    const ref = fbDb.ref('tamgu-shared/' + tab.shared.shareId);
+    const handler = (snap)=>{
+      if(!snap.exists()) return;
+      const remote = snap.val();
+      const remoteUpdated = remote.updatedAt || 0;
+      if(remoteUpdated <= (tab._lastKnownUpdatedAt||0)) return;
+      if(saveTimer || isEditingNow()) return; // will catch up once idle
+      tab.blocks = remote.blocks || tab.blocks;
+      tab.title = remote.title || tab.title;
+      tab.shared.collaborators = remote.collaborators || tab.shared.collaborators;
+      tab._lastKnownUpdatedAt = remoteUpdated;
+      const cur = getActiveTab();
+      if(cur && cur.id === tab.id){ renderTabs(); renderEditor(); showToast('공동 편집자가 방금 수정한 내용을 불러왔어요'); }
+    };
+    ref.on('value', handler, (err)=> console.error('공유 노트 실시간 동기화 오류', err));
+    activeSharedUnsub = ()=> ref.off('value', handler);
+  }
+  function detachActiveSharedListener(){ if(activeSharedUnsub){ activeSharedUnsub(); activeSharedUnsub = null; } }
 
 
   function newBlock(level, type, html){
@@ -773,9 +955,9 @@
     $('#app').classList.add('active');
     $('#userNameLabel').textContent = profile.name;
     $('#avatarInitial').textContent = profile.name.slice(0,1);
-    renderTabs();
-    renderEditor();
+    if(!profile.tabs.find(t=>t.id===profile.activeTabId)) profile.activeTabId = profile.tabs[0].id;
     startSyncPolling();
+    await switchToTab(profile.activeTabId);
   }
   $('#loginBtn').addEventListener('click', doLogin);
   $('#nameInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doLogin(); });
@@ -797,9 +979,11 @@
     window.addEventListener('focus', onWindowFocusSync);
     document.addEventListener('visibilitychange', onVisibilityChangeSync);
     if(STORAGE_MODE === 'claude'){
-      syncInterval = setInterval(()=> syncFromStorage(false), 4000);
+      syncInterval = setInterval(()=>{ syncFromStorage(false); checkInboxPollClaude(); }, 4000);
+      checkInboxPollClaude();
     } else if(STORAGE_MODE === 'firebase'){
       attachRealtimeListener();
+      attachInboxListener();
     }
   }
   function stopSyncPolling(){
@@ -807,9 +991,11 @@
     window.removeEventListener('focus', onWindowFocusSync);
     document.removeEventListener('visibilitychange', onVisibilityChangeSync);
     detachRealtimeListener();
+    detachInboxListener();
+    detachActiveSharedListener();
   }
-  function onWindowFocusSync(){ syncFromStorage(false); }
-  function onVisibilityChangeSync(){ if(document.visibilityState === 'visible') syncFromStorage(false); }
+  function onWindowFocusSync(){ syncFromStorage(false); if(STORAGE_MODE==='claude') checkInboxPollClaude(); }
+  function onVisibilityChangeSync(){ if(document.visibilityState === 'visible'){ syncFromStorage(false); if(STORAGE_MODE==='claude') checkInboxPollClaude(); } }
 
   // ---------- boot ----------
   detectStorageMode();
@@ -830,18 +1016,25 @@
     profile.tabs.forEach(tab=>{
       const item = document.createElement('div');
       item.className = 'tab-item' + (tab.id === profile.activeTabId ? ' active' : '');
+      const sharedBadge = tab.shared ? `<span class="shared-badge" title="${escapeHtml((tab.shared.collaborators||[]).join(', '))}님과 함께 편집 중">👥</span>` : '';
       item.innerHTML = `<span class="swatch" style="background:${tab.color}"></span>
         <span class="label">${escapeHtml(tab.title || tab.name || '제목 없는 조사')}</span>
+        ${sharedBadge}
+        <span class="share-tab" title="다른 사람과 공유">🔗</span>
         <span class="del-tab" title="삭제">✕</span>`;
       item.addEventListener('click', (e)=>{
-        if(e.target.classList.contains('del-tab')) return;
-        profile.activeTabId = tab.id;
-        renderTabs(); renderEditor();
+        if(e.target.classList.contains('del-tab') || e.target.classList.contains('share-tab')) return;
+        switchToTab(tab.id);
+      });
+      $('.share-tab', item).addEventListener('click', (e)=>{
+        e.stopPropagation();
+        shareTab(tab);
       });
       $('.del-tab', item).addEventListener('click', (e)=>{
         e.stopPropagation();
         if(profile.tabs.length <= 1){ showToast('마지막 탭은 남겨둘게요'); return; }
         if(!confirm('이 조사 탭을 삭제할까요?')) return;
+        detachActiveSharedListener();
         profile.tabs = profile.tabs.filter(t=>t.id !== tab.id);
         if(profile.activeTabId === tab.id) profile.activeTabId = profile.tabs[0].id;
         renderTabs(); renderEditor(); scheduleSave();
@@ -850,7 +1043,33 @@
     });
   }
 
+  async function switchToTab(tabId){
+    detachActiveSharedListener();
+    profile.activeTabId = tabId;
+    renderTabs();
+    const tab = getActiveTab();
+    if(tab && tab.shared){
+      renderEditor(); // show cached content immediately while we refresh
+      try{
+        const fresh = await readSharedNode(tab.shared.shareId);
+        if(fresh && (fresh.updatedAt||0) > (tab._lastKnownUpdatedAt||0)){
+          tab.blocks = fresh.blocks || tab.blocks;
+          tab.title = fresh.title || tab.title;
+          tab.color = fresh.color || tab.color;
+          tab.shared.collaborators = fresh.collaborators || tab.shared.collaborators;
+          tab.shared.owner = fresh.owner || tab.shared.owner;
+          tab._lastKnownUpdatedAt = fresh.updatedAt || tab._lastKnownUpdatedAt;
+          renderTabs(); renderEditor();
+        }
+      }catch(e){ console.error(e); }
+      attachActiveSharedListener(tab);
+    } else {
+      renderEditor();
+    }
+  }
+
   $('#addTabBtn').addEventListener('click', ()=>{
+    detachActiveSharedListener();
     const t = newTab();
     profile.tabs.push(t);
     profile.activeTabId = t.id;
