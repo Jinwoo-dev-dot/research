@@ -1,4 +1,4 @@
--<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
@@ -315,6 +315,29 @@
   .row .content table th{ background: rgba(59,50,38,0.06); }
   .row .content img{ max-width:100%; border-radius:8px; border:2px solid var(--ink); margin:6px 0; }
   .row .content hr{ border:none; border-top:2px dashed var(--line); margin:10px 0; }
+  .row .content::after{ content:''; display:table; clear:both; }
+
+  .img-embed{ position:relative; display:block; max-width:100%; margin:8px 0; }
+  .img-embed[data-align="left"]{ float:left; display:inline-block; max-width:58%; margin:6px 16px 10px 0; }
+  .img-embed[data-align="right"]{ float:right; display:inline-block; max-width:58%; margin:6px 0 10px 16px; }
+  .img-embed[data-align="center"]{ float:none; margin:10px auto; width:fit-content; }
+  .img-embed[data-align="block"]{ float:none; width:100%; margin:8px 0; }
+  .img-embed img{ display:block; width:100%; max-width:100%; height:auto; border-radius:8px; border:2px solid var(--ink); margin:0; pointer-events:none; user-select:none; }
+  .img-embed .img-toolbar{
+    position:absolute; top:-32px; left:0; display:none; gap:3px;
+    background:var(--paper); border:1.5px solid var(--ink); border-radius:9px; padding:3px; z-index:5;
+  }
+  .img-embed:hover .img-toolbar{ display:flex; }
+  .img-embed .img-toolbar button{
+    border:none; background:transparent; cursor:pointer; font-size:12px; padding:3px 6px; border-radius:6px; color:var(--ink-soft);
+  }
+  .img-embed .img-toolbar button:hover{ background:rgba(59,50,38,0.08); color:var(--ink); }
+  .img-embed .img-resize-handle{
+    position:absolute; width:13px; height:13px; right:-5px; bottom:-5px;
+    background:var(--terracotta); border:2px solid #fff; border-radius:50%;
+    cursor:nwse-resize; display:none; box-shadow:0 1px 3px rgba(0,0,0,0.25);
+  }
+  .img-embed:hover .img-resize-handle{ display:block; }
   .row .collapsed-badge{ font-size:11px; color:var(--ink-soft); background:rgba(59,50,38,0.06); border-radius:8px; padding:1px 7px; margin-left:6px; margin-top:5px; flex-shrink:0; }
 
   .row[data-type="h1"] .content{ font-family:'Jua',sans-serif; font-size:25px; padding-top:10px; }
@@ -1170,6 +1193,7 @@
       content.dataset.id = block.id;
 
       content.addEventListener('input', ()=>{
+        content.dataset.softEnter = '';
         block.html = content.innerHTML;
         maybeAutoTransform(block, content);
         updateWordCount();
@@ -1279,6 +1303,19 @@
     return { before: el.innerHTML, after: afterDiv.innerHTML };
   }
 
+  function buildImageEmbedHtml(dataUrl){
+    return '<span class="img-embed" contenteditable="false" data-align="block">'
+      + '<img src="' + dataUrl + '" draggable="false">'
+      + '<span class="img-toolbar">'
+      + '<button type="button" data-align-btn="left" title="왼쪽에 배치 (글이 옆으로 흘러요)">◧</button>'
+      + '<button type="button" data-align-btn="center" title="가운데 배치">▣</button>'
+      + '<button type="button" data-align-btn="right" title="오른쪽에 배치 (글이 옆으로 흘러요)">◨</button>'
+      + '<button type="button" data-align-btn="block" title="전체 너비">▭</button>'
+      + '</span>'
+      + '<span class="img-resize-handle"></span>'
+      + '</span>&#8203;';
+  }
+
   function readFileAsDataURL(file){
     return new Promise((resolve, reject)=>{
       const reader = new FileReader();
@@ -1300,7 +1337,7 @@
     if(imageFile){
       e.preventDefault();
       readFileAsDataURL(imageFile).then(dataUrl=>{
-        document.execCommand('insertImage', false, dataUrl);
+        document.execCommand('insertHTML', false, buildImageEmbedHtml(dataUrl));
         block.html = el.innerHTML;
         updateWordCount();
         scheduleSave();
@@ -1316,6 +1353,15 @@
     }, 0);
   }
 
+  function stripTrailingBr(html){
+    const d = document.createElement('div');
+    d.innerHTML = html;
+    let last = d.lastChild;
+    while(last && last.nodeType === 3 && last.textContent === ''){ const prev = last.previousSibling; d.removeChild(last); last = prev; }
+    if(last && last.nodeName === 'BR'){ d.removeChild(last); }
+    return d.innerHTML;
+  }
+
   function handleKeydown(e, block, el){
     const tab = getActiveTab();
     const idx = tab.blocks.findIndex(b=>b.id===block.id);
@@ -1323,15 +1369,38 @@
 
     if(e.key === 'Enter' && !e.shiftKey){
       e.preventDefault();
-      if(isListType && el.textContent.trim()===''){
-        block.type = 'text'; block.html='';
-        renderEditor(); scheduleSave(); focusBlock(block.id,false); return;
+
+      if(isListType){
+        if(el.textContent.trim()===''){
+          block.type = 'text'; block.html='';
+          renderEditor(); scheduleSave(); focusBlock(block.id,false); return;
+        }
+        const {before, after} = splitContentAtCaret(el);
+        block.html = before;
+        const nb = newBlock(block.level, block.type, after);
+        tab.blocks.splice(idx+1, 0, nb);
+        renderEditor(); scheduleSave(); focusBlock(nb.id, true);
+        return;
       }
-      const {before, after} = splitContentAtCaret(el);
-      block.html = before;
-      const nb = newBlock(block.level, isListType ? block.type : (block.type==='h1'||block.type==='h2'||block.type==='h3'||block.type==='quote'||block.type==='code' ? 'text' : block.type), after);
-      tab.blocks.splice(idx+1, 0, nb);
-      renderEditor(); scheduleSave(); focusBlock(nb.id, true);
+
+      // non-list blocks: first Enter = soft line break (stay in the same box),
+      // a second Enter right after an empty soft-break line = start a new box.
+      if(el.dataset.softEnter === '1'){
+        const {before, after} = splitContentAtCaret(el);
+        const beforeClean = stripTrailingBr(before);
+        block.html = beforeClean;
+        const newType = (block.type==='h1'||block.type==='h2'||block.type==='h3'||block.type==='quote'||block.type==='code') ? 'text' : block.type;
+        const nb = newBlock(block.level, newType, after);
+        tab.blocks.splice(idx+1, 0, nb);
+        renderEditor(); scheduleSave(); focusBlock(nb.id, true);
+        return;
+      }
+
+      document.execCommand('insertLineBreak', false, null);
+      el.dataset.softEnter = '1';
+      block.html = el.innerHTML;
+      updateWordCount();
+      scheduleSave();
       return;
     }
 
@@ -1502,7 +1571,7 @@
     try{
       const dataUrl = await readFileAsDataURL(file);
       restoreLastSelection();
-      document.execCommand('insertImage', false, dataUrl);
+      document.execCommand('insertHTML', false, buildImageEmbedHtml(dataUrl));
       syncActiveBlockHtml();
     }catch(err){ showToast('이미지를 불러오지 못했어요'); }
   });
@@ -1537,6 +1606,55 @@
     document.execCommand('hiliteColor', false, 'transparent');
     syncActiveBlockHtml();
   });
+
+  function syncContentAncestor(node){
+    const contentEl = node.closest('.content');
+    if(!contentEl) return;
+    const tab = getActiveTab();
+    const block = tab.blocks.find(b => b.id === contentEl.dataset.id);
+    if(block){ block.html = contentEl.innerHTML; updateWordCount(); scheduleSave(); }
+  }
+
+  // ---------- image embed: align + resize ----------
+  $('#outline').addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-align-btn]');
+    if(!btn) return;
+    e.preventDefault(); e.stopPropagation();
+    const embed = btn.closest('.img-embed');
+    if(!embed) return;
+    embed.dataset.align = btn.dataset.alignBtn;
+    syncContentAncestor(embed);
+  });
+
+  let resizingEmbed = null, resizeStartX = 0, resizeStartW = 0;
+  $('#outline').addEventListener('mousedown', (e)=>{
+    const handle = e.target.closest('.img-resize-handle');
+    if(!handle) return;
+    e.preventDefault(); e.stopPropagation();
+    const embed = handle.closest('.img-embed');
+    const img = embed.querySelector('img');
+    resizingEmbed = embed;
+    resizeStartX = e.clientX;
+    resizeStartW = img.getBoundingClientRect().width;
+    document.addEventListener('mousemove', onImgResizeMove);
+    document.addEventListener('mouseup', onImgResizeUp);
+  });
+  function onImgResizeMove(e){
+    if(!resizingEmbed) return;
+    const img = resizingEmbed.querySelector('img');
+    const parent = resizingEmbed.closest('.content');
+    const maxW = parent ? parent.getBoundingClientRect().width : 700;
+    let newW = Math.max(60, resizeStartW + (e.clientX - resizeStartX));
+    newW = Math.min(newW, maxW);
+    img.style.width = newW + 'px';
+    resizingEmbed.style.width = newW + 'px';
+  }
+  function onImgResizeUp(){
+    if(resizingEmbed) syncContentAncestor(resizingEmbed);
+    resizingEmbed = null;
+    document.removeEventListener('mousemove', onImgResizeMove);
+    document.removeEventListener('mouseup', onImgResizeUp);
+  }
 
   function syncActiveBlockHtml(){
     const el = document.activeElement;
