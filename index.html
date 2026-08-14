@@ -281,6 +281,26 @@
   #charCountPopover button{ margin-top:8px; width:100%; border:1.5px solid var(--line); background:transparent; border-radius:9px; padding:5px; cursor:pointer; font-size:12px; color:var(--ink-soft); }
   #charCountPopover button:hover{ border-color:var(--ink); color:var(--ink); }
 
+  #spellPopover{
+    display:none; position:fixed; z-index:60;
+    background: var(--paper); border:2px solid var(--ink); border-radius:14px;
+    padding:12px 14px; box-shadow: var(--shadow); width:300px; max-height:360px; overflow-y:auto;
+  }
+  #spellPopover h4{ margin:0 0 8px; font-size:13px; color:var(--ink-soft); font-weight:700; }
+  #spellPopover .sp-item{ border-top:1px solid var(--line-soft); padding:8px 0; }
+  #spellPopover .sp-item:first-of-type{ border-top:none; }
+  #spellPopover .sp-orig{ font-size:13.5px; color:var(--terracotta); text-decoration:line-through; margin-bottom:3px; }
+  #spellPopover .sp-help{ font-size:11.5px; color:var(--ink-faint); margin-bottom:5px; }
+  #spellPopover .sp-suggestions{ display:flex; flex-wrap:wrap; gap:5px; }
+  #spellPopover .sp-suggestions button{
+    border:1.5px solid var(--line); background:transparent; border-radius:8px; padding:4px 9px;
+    cursor:pointer; font-size:12.5px; color:var(--ink); font-family:'Gowun Dodum',sans-serif;
+  }
+  #spellPopover .sp-suggestions button:hover{ border-color:var(--sage); background:rgba(124,148,115,0.1); }
+  #spellPopover .sp-empty{ font-size:13px; color:var(--ink-soft); padding:6px 0; }
+  #spellPopover .sp-close{ margin-top:8px; width:100%; border:1.5px solid var(--line); background:transparent; border-radius:9px; padding:5px; cursor:pointer; font-size:12px; color:var(--ink-soft); }
+  #spellPopover .sp-close:hover{ border-color:var(--ink); color:var(--ink); }
+
   .doc-scroll{ flex:1; overflow-y:auto; padding: 26px 0 60px; }
   .doc-wrap{ max-width: 780px; margin: 0 auto; padding: 0 42px; }
   .tab-title{
@@ -307,7 +327,6 @@
   .row[data-type="todo"] .marker input{ width:16px;height:16px; accent-color: var(--terracotta); cursor:pointer; }
   .row[data-type="todo"].checked .content{ color:var(--ink-faint); text-decoration: line-through; }
   .row .content{ flex:1; outline:none; padding: 4px 4px; font-size:16px; line-height:1.7; min-height: 24px; color: var(--ink); word-break: break-word; }
-  .row .content:empty:before{ content: attr(data-placeholder); color: rgba(59,50,38,0.28); }
   .row .content a{ color: var(--linkblue) !important; text-decoration:underline !important; cursor:pointer; }
   .row .content code.inline-code{ background: rgba(59,50,38,0.08); border:1px solid var(--line-soft); border-radius:5px; padding:1px 6px; font-family:'Courier New',monospace; font-size:14px; }
   .row .content table{ border-collapse:collapse; margin:8px 0; width:100%; }
@@ -365,6 +384,29 @@
     font-size:13px; opacity:0; pointer-events:none; transition: all .25s ease; z-index:50;
   }
   .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
+
+  #printArea{ display:none; }
+  @media print{
+    body *{ visibility:hidden; }
+    #printArea, #printArea *{ visibility:visible; }
+    #printArea{ display:block; position:absolute; top:0; left:0; width:100%; padding:10px 20px; }
+    .print-title{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:24px; margin:0 0 18px; color:#2a2318; }
+    .print-row{ display:flex; gap:7px; align-items:flex-start; font-size:13px; line-height:1.65; color:#222; margin-bottom:3px; }
+    .print-marker{ flex-shrink:0; color:#555; }
+    .print-content{ flex:1; word-break:break-word; }
+    .print-type-h1 .print-content{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:18px; font-weight:700; margin-top:10px; }
+    .print-type-h2 .print-content{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:15.5px; font-weight:700; margin-top:8px; }
+    .print-type-h3 .print-content{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:14px; font-weight:700; color:#a1583a; margin-top:6px; }
+    .print-type-quote{ border-left:3px solid #a1583a; padding-left:8px; font-style:italic; color:#555; }
+    .print-type-code .print-content{ font-family:'Courier New',monospace; background:#f1f1f1; padding:4px 6px; border-radius:4px; }
+    .print-checked .print-content{ text-decoration:line-through; color:#888; }
+    .print-content img{ max-width:100%; }
+    .print-content table{ border-collapse:collapse; margin:4px 0; }
+    .print-content table td, .print-content table th{ border:1px solid #333; padding:4px 8px; font-size:12px; }
+    .print-content a{ color:#1a56db; text-decoration:underline; }
+    .print-content code.inline-code{ background:#eee; padding:1px 5px; border-radius:4px; font-family:'Courier New',monospace; }
+    .img-toolbar, .img-resize-handle{ display:none !important; }
+  }
 </style>
 </head>
 <body>
@@ -508,6 +550,9 @@
         <div class="sep"></div>
         <button id="charCountBtn" title="선택한 부분 글자수 확인">🔤 글자수 체크</button>
         <button id="searchToggleBtn" title="찾기">🔎</button>
+        <div class="sep"></div>
+        <button id="exportPdfBtn" title="PDF로 저장하거나 인쇄하기">🖨️ 내보내기</button>
+        <button id="spellCheckBtn" title="선택한 문장(또는 지금 문단)을 복사해서 바른한글 맞춤법 검사 사이트로 이동">✅ 맞춤법 검사</button>
       </div>
 
       <div id="searchBox">
@@ -522,6 +567,12 @@
         <div class="ccp-row"><span>띄어쓰기 미포함</span><b id="ccpWithout">0자</b></div>
         <div class="ccp-row"><span>단어수</span><b id="ccpWords">0개</b></div>
         <button id="ccpCloseBtn">닫기</button>
+      </div>
+
+      <div id="spellPopover">
+        <h4>맞춤법 검사 결과</h4>
+        <div id="spellResults"></div>
+        <button class="sp-close" id="spellCloseBtn">닫기</button>
       </div>
 
       <div class="doc-scroll">
@@ -541,6 +592,7 @@
 </div>
 
 <div class="toast" id="toast"></div>
+<div id="printArea"></div>
 
 <script>
 (function(){
@@ -1188,7 +1240,7 @@
       const content = document.createElement('div');
       content.className = 'content';
       content.contentEditable = 'true';
-      content.dataset.placeholder = placeholderFor(block.type);
+      content.spellcheck = true;
       content.innerHTML = block.html || '';
       content.dataset.id = block.id;
 
@@ -1708,6 +1760,172 @@
   $('#searchNextBtn').addEventListener('click', ()=>doFind(false));
   $('#searchPrevBtn').addEventListener('click', ()=>doFind(true));
   $('#searchInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doFind(e.shiftKey); });
+
+  // ---------- export to PDF / print ----------
+  function buildPrintHtml(tab){
+    let html = '<h1 class="print-title">' + escapeHtml(tab.title || '제목 없는 조사') + '</h1>';
+    tab.blocks.forEach((block, idx)=>{
+      const indent = block.level * 22;
+      let marker = '';
+      if(block.type === 'bullet') marker = '<span class="print-marker">•</span>';
+      else if(block.type === 'ordered') marker = '<span class="print-marker">' + computeOrderedIndex(tab.blocks, idx) + '.</span>';
+      else if(block.type === 'todo') marker = '<span class="print-marker">' + (block.checked ? '☑' : '☐') + '</span>';
+      const checkedClass = (block.type === 'todo' && block.checked) ? ' print-checked' : '';
+      html += '<div class="print-row print-type-' + block.type + checkedClass + '" style="margin-left:' + indent + 'px">'
+        + marker
+        + '<div class="print-content">' + (block.html || '') + '</div>'
+        + '</div>';
+    });
+    return html;
+  }
+
+  let originalDocTitle = document.title;
+  $('#exportPdfBtn').addEventListener('click', ()=>{
+    const tab = getActiveTab();
+    if(!tab){ showToast('내보낼 조사가 없어요'); return; }
+    $('#printArea').innerHTML = buildPrintHtml(tab);
+    originalDocTitle = document.title;
+    document.title = tab.title || tab.name || '탐구노트';
+    window.print();
+  });
+  window.addEventListener('afterprint', ()=>{ document.title = originalDocTitle; });
+
+  // ---------- spell check (Korean, via a Firebase Function you deploy) ----------
+  const SPELLCHECK_URL_KEY = 'tamgu-spellcheck-url';
+
+  function getSpellcheckUrl(promptIfMissing){
+    let url = localStorage.getItem(SPELLCHECK_URL_KEY);
+    if(!url && promptIfMissing){
+      const guess = 'https://us-central1-' + (DEFAULT_FIREBASE_CONFIG.projectId||'') + '.cloudfunctions.net/checkSpelling';
+      const input = prompt('맞춤법 검사 서버(Cloud Function) 주소를 입력해주세요\n(배포 후 나온 주소를 붙여넣으세요)', guess);
+      if(input && input.trim()){
+        url = input.trim();
+        localStorage.setItem(SPELLCHECK_URL_KEY, url);
+      }
+    }
+    return url;
+  }
+
+  let lastSpellTargetContent = null;
+
+  $('#spellCheckBtn').addEventListener('mousedown', e=>e.preventDefault());
+  $('#spellCheckBtn').addEventListener('click', async ()=>{
+    const sel = window.getSelection();
+    let text = sel ? sel.toString().trim() : '';
+
+    if(!text){
+      const el = document.activeElement && document.activeElement.classList.contains('content')
+        ? document.activeElement
+        : $(`.content[data-id="${activeRowId}"]`);
+      if(el) text = el.innerText.trim();
+    }
+
+    if(!text){
+      showToast('맞춤법을 확인할 문장을 드래그해서 선택하거나, 문단을 클릭한 뒤 눌러주세요');
+      return;
+    }
+
+    const SPELLER_URL = 'https://nara-speller.co.kr/speller/';
+    let copied = false;
+    try{
+      await navigator.clipboard.writeText(text);
+      copied = true;
+    }catch(e){
+      // clipboard API can fail on http/file:// pages — fall back to a manual copy dialog
+      window.prompt('아래 문장을 직접 복사(Ctrl+C)해주세요:', text);
+    }
+
+    window.open(SPELLER_URL + '?text=' + encodeURIComponent(text), '_blank');
+
+    showToast(copied
+      ? '문장이 복사됐어요! 새 탭에서 Ctrl+V로 붙여넣고 "검사하기"를 눌러주세요'
+      : '새 탭이 열렸어요 — 복사한 문장을 붙여넣고 "검사하기"를 눌러주세요');
+  });
+  /* legacy Cloud-Function-based spell check (kept for reference, unused now):
+  $('#spellCheckBtnOld_unused').addEventListener('click', async ()=>{
+    const el = document.activeElement && document.activeElement.classList.contains('content')
+      ? document.activeElement
+      : $(`.content[data-id="${activeRowId}"]`);
+    if(!el){ showToast('맞춤법을 확인할 문단을 먼저 클릭해주세요'); return; }
+    const text = el.innerText.trim();
+    if(!text){ showToast('내용이 비어있어요'); return; }
+
+    const url = getSpellcheckUrl(true);
+    if(!url) return;
+
+    showToast('맞춤법을 확인하고 있어요...');
+    try{
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      if(!res.ok) throw new Error('서버 응답 오류 (' + res.status + ')');
+      const data = await res.json();
+      lastSpellTargetContent = el;
+      renderSpellResults(data.corrections || [], el);
+    }catch(err){
+      console.error(err);
+      const retry = confirm('맞춤법 서버에 연결하지 못했어요. 서버 주소를 다시 입력해볼까요?');
+      if(retry){
+        localStorage.removeItem(SPELLCHECK_URL_KEY);
+        getSpellcheckUrl(true);
+      }
+    }
+  });
+  */
+
+  function renderSpellResults(corrections, anchorEl){
+    const box = $('#spellResults');
+    box.innerHTML = '';
+    if(!corrections.length){
+      box.innerHTML = '<div class="sp-empty">고칠 부분을 찾지 못했어요 👍</div>';
+    } else {
+      corrections.forEach((c)=>{
+        const item = document.createElement('div');
+        item.className = 'sp-item';
+        const suggBtns = (c.suggestions && c.suggestions.length)
+          ? c.suggestions.map(s => `<button type="button" data-fix="${escapeHtml(s)}" data-orig="${escapeHtml(c.original)}">${escapeHtml(s)}</button>`).join('')
+          : '<span class="sp-help">제안 없음</span>';
+        item.innerHTML = `<div class="sp-orig">${escapeHtml(c.original)}</div>`
+          + (c.help ? `<div class="sp-help">${escapeHtml(c.help)}</div>` : '')
+          + `<div class="sp-suggestions">${suggBtns}</div>`;
+        box.appendChild(item);
+      });
+    }
+    $$('.sp-suggestions button[data-fix]', box).forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        applySpellFix(btn.dataset.orig, btn.dataset.fix);
+      });
+    });
+    const pop = $('#spellPopover');
+    const rect = anchorEl.getBoundingClientRect();
+    pop.style.display = 'block';
+    let left = Math.min(rect.left, window.innerWidth - 320);
+    pop.style.left = Math.max(10, left) + 'px';
+    pop.style.top = Math.min(rect.bottom + 8, window.innerHeight - 400) + 'px';
+  }
+
+  function applySpellFix(original, fix){
+    if(!lastSpellTargetContent) return;
+    const el = lastSpellTargetContent;
+    if(el.innerHTML.indexOf(original) !== -1){
+      el.innerHTML = el.innerHTML.replace(original, fix);
+    } else {
+      // formatting tags may split the phrase; fall back to a plain-text-based replace
+      el.textContent = el.textContent.replace(original, fix);
+    }
+    syncContentAncestor(el);
+    showToast('바꿨어요');
+  }
+
+  $('#spellCloseBtn').addEventListener('click', ()=>{ $('#spellPopover').style.display = 'none'; });
+  document.addEventListener('mousedown', (e)=>{
+    const pop = $('#spellPopover');
+    if(pop.style.display === 'block' && !pop.contains(e.target) && e.target.id !== 'spellCheckBtn'){
+      pop.style.display = 'none';
+    }
+  });
 
   window.addEventListener('beforeunload', ()=>{ if(profile) saveProfile(); });
 
