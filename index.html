@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>탐구노트 · 조사와 기록의 캔버스</title>
+<title>생각 정리 노트</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Gowun+Batang&family=Nanum+Pen+Script&family=Jua&family=Nanum+Gothic:wght@400;700;800&family=Song+Myung&family=Gowun+Dodum&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
@@ -27,6 +27,25 @@
     --linkblue:#1a56db;
     --shadow: 0 8px 24px rgba(59,50,38,0.14);
   }
+  body.dark{
+    --canvas:#221E19;
+    --canvas2:#2B2620;
+    --ink:#EFE7DA;
+    --ink-soft:#B8AE9E;
+    --ink-faint:#8A8074;
+    --paper:#2A2520;
+    --terracotta:#E0916A;
+    --sage:#9BBE92;
+    --dusty:#8FB1CE;
+    --mustard:#E3BD6C;
+    --plum:#C08CB0;
+    --line: rgba(239,231,218,0.16);
+    --line-soft: rgba(239,231,218,0.08);
+    --linkblue:#7fa8f5;
+    --shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  body.focus-mode .tab-rail, body.focus-mode .toolbar, body.focus-mode #searchBox{ display:none !important; }
+  body.focus-mode .doc-wrap{ max-width:640px; }
   *{box-sizing:border-box;}
   html,body{height:100%;}
   body{
@@ -84,7 +103,7 @@
   .login-title{
     font-family:'Caveat', 'Gaegu', sans-serif;
     font-weight:700;
-    font-size: 46px;
+    font-size: 38px;
     color: var(--ink);
     margin: 0;
     position:relative; display:inline-block;
@@ -165,7 +184,7 @@
     font-family:'Caveat', sans-serif; font-weight:700; font-size:26px; color:var(--ink);
   }
   .user-chip{
-    display:flex; align-items:center; gap:10px;
+    display:flex; align-items:center; gap:8px; flex-wrap:wrap; justify-content:flex-end;
     font-size:13.5px; color:var(--ink-soft);
   }
   .user-chip .avatar{
@@ -224,6 +243,21 @@
   .tab-item:hover .share-tab{ opacity:0.55; }
   .tab-item .share-tab:hover{ opacity:1; color:var(--dusty); }
   .tab-item .shared-badge{ font-size:11px; flex-shrink:0; }
+  .tab-search-input{
+    width:100%; margin-bottom:10px; padding:8px 12px; border-radius:12px;
+    border:1.5px solid var(--line); background:var(--paper); color:var(--ink);
+    font-family:'Gowun Dodum',sans-serif; font-size:12.5px; outline:none;
+  }
+  .tab-search-input:focus{ border-color:var(--terracotta); }
+  .tab-item .pin-tab, .tab-item .dup-tab, .tab-item .emoji-tab{
+    opacity:0; font-size:12px; color:var(--ink-soft); cursor:pointer; padding:2px 3px; flex-shrink:0;
+  }
+  .tab-item:hover .pin-tab, .tab-item:hover .dup-tab, .tab-item:hover .emoji-tab{ opacity:0.55; }
+  .tab-item .pin-tab:hover, .tab-item .dup-tab:hover, .tab-item .emoji-tab:hover{ opacity:1; color:var(--terracotta); }
+  .tab-item.pinned .pin-tab{ opacity:1; color:var(--mustard); }
+  .tab-item.search-hidden{ display:none; }
+  .tab-item.search-match{ outline:2px solid var(--sage); }
+  .tab-emoji{ font-size:13px; flex-shrink:0; }
 
   .add-tab-btn{
     margin-top:4px;
@@ -281,6 +315,17 @@
   #charCountPopover button{ margin-top:8px; width:100%; border:1.5px solid var(--line); background:transparent; border-radius:9px; padding:5px; cursor:pointer; font-size:12px; color:var(--ink-soft); }
   #charCountPopover button:hover{ border-color:var(--ink); color:var(--ink); }
 
+  #infoPopover{
+    display:none; position:fixed; z-index:60;
+    background: var(--paper); border:2px solid var(--ink); border-radius:14px;
+    padding:14px 16px; box-shadow: var(--shadow); overflow-y:auto;
+  }
+  #infoPopover .ccp-row{ padding:5px 0; border-bottom:1px solid var(--line-soft); }
+  #infoPopover .ccp-row:last-of-type{ border-bottom:none; }
+  #infoPopover button{ margin-top:8px; width:100%; border:1.5px solid var(--line); background:transparent; border-radius:9px; padding:5px; cursor:pointer; font-size:12px; color:var(--ink-soft); }
+  #infoPopover button:hover{ border-color:var(--ink); color:var(--ink); }
+  #infoPopover .sp-empty{ font-size:13px; color:var(--ink-soft); padding:6px 0; }
+
   #spellPopover{
     display:none; position:fixed; z-index:60;
     background: var(--paper); border:2px solid var(--ink); border-radius:14px;
@@ -300,6 +345,20 @@
   #spellPopover .sp-empty{ font-size:13px; color:var(--ink-soft); padding:6px 0; }
   #spellPopover .sp-close{ margin-top:8px; width:100%; border:1.5px solid var(--line); background:transparent; border-radius:9px; padding:5px; cursor:pointer; font-size:12px; color:var(--ink-soft); }
   #spellPopover .sp-close:hover{ border-color:var(--ink); color:var(--ink); }
+
+  #tableMenu{
+    display:none; position:fixed; z-index:70;
+    background: var(--paper); border:2px solid var(--ink); border-radius:12px;
+    padding:6px; box-shadow: var(--shadow); min-width:160px;
+  }
+  #tableMenu button{
+    display:flex; width:100%; text-align:left; border:none; background:transparent;
+    padding:8px 10px; border-radius:8px; cursor:pointer; font-size:13px; color:var(--ink);
+    font-family:'Gowun Dodum',sans-serif; gap:8px; align-items:center;
+  }
+  #tableMenu button:hover{ background:rgba(59,50,38,0.08); }
+  #tableMenu button.danger{ color:var(--terracotta); }
+  #tableMenu hr{ border:none; border-top:1px solid var(--line-soft); margin:4px 2px; }
 
   .doc-scroll{ flex:1; overflow-y:auto; padding: 26px 0 60px; }
   .doc-wrap{ max-width: 780px; margin: 0 auto; padding: 0 42px; }
@@ -390,7 +449,8 @@
     body *{ visibility:hidden; }
     #printArea, #printArea *{ visibility:visible; }
     #printArea{ display:block; position:absolute; top:0; left:0; width:100%; padding:10px 20px; }
-    .print-title{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:24px; margin:0 0 18px; color:#2a2318; }
+    .print-doc-title{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:26px; margin:0 0 6px; color:#2a2318; text-align:center; }
+    .print-doc-author{ font-size:13px; color:#555; text-align:center; margin:0 0 22px; }
     .print-row{ display:flex; gap:7px; align-items:flex-start; font-size:13px; line-height:1.65; color:#222; margin-bottom:3px; }
     .print-marker{ flex-shrink:0; color:#555; }
     .print-content{ flex:1; word-break:break-word; }
@@ -452,7 +512,7 @@
 <div id="loginScreen">
   <div class="login-card">
     <div class="brand-mark">🖋️</div>
-    <h1 class="login-title">탐구노트
+    <h1 class="login-title">생각 정리 노트
       <svg viewBox="0 0 200 14" preserveAspectRatio="none"><path d="M2 8 Q 30 2, 55 8 T 105 7 T 155 9 T 198 6" stroke="#C1653F" stroke-width="3" fill="none" stroke-linecap="round"/></svg>
     </h1>
     <p class="login-sub">자료를 찾고, 조사하고, 알게 된 것을 기록하는<br>나만의 리서치 캔버스</p>
@@ -467,8 +527,13 @@
 <!-- APP -->
 <div id="app">
   <header class="topbar">
-    <div class="brand">🖋️ 탐구노트</div>
+    <div class="brand">🖋️ 생각 정리 노트</div>
     <div class="user-chip">
+      <button class="logout-btn" id="askClaudeBtn" title="이 조사 내용을 가지고 Claude에게 물어보기">🤖 Claude에게 묻기</button>
+      <button class="logout-btn" id="backupBtn" title="전체 백업/복원">📦 백업</button>
+      <button class="logout-btn" id="shortcutsBtn" title="단축키 안내">❓</button>
+      <button class="logout-btn" id="focusModeBtn" title="집중 모드 (사이드바/툴바 숨기기)">🎯</button>
+      <button class="logout-btn" id="darkModeBtn" title="어두운 화면">🌙</button>
       <div class="save-status" id="saveStatus"><span class="sdot"></span><span id="saveStatusText">저장됨</span></div>
       <button class="logout-btn" id="syncBtn" title="다른 창의 최신 내용 불러오기">🔄 동기화</button>
       <div class="avatar" id="avatarInitial">?</div>
@@ -479,6 +544,7 @@
 
   <div class="main-area">
     <div class="tab-rail" id="tabRail">
+      <input id="tabSearchInput" class="tab-search-input" type="text" placeholder="🔍 모든 조사에서 찾기..." />
       <div class="rail-label">조사 주제</div>
       <div class="add-tab-btn" id="addTabBtn">＋ 새 조사 시작</div>
     </div>
@@ -544,6 +610,7 @@
         <button id="linkBtn" title="링크 삽입">🔗</button>
         <button id="imageBtn" title="이미지 삽입 (파일 업로드)">🖼️</button>
         <input type="file" id="imageFileInput" accept="image/*" style="display:none">
+        <input type="file" id="backupFileInput" accept="application/json" style="display:none">
         <button id="tableBtn" title="표 삽입">▦</button>
         <button id="dividerBtn" title="구분선 삽입">— —</button>
         <button id="clearFormatBtn" title="서식 지우기">✂️</button>
@@ -553,6 +620,7 @@
         <div class="sep"></div>
         <button id="exportPdfBtn" title="PDF로 저장하거나 인쇄하기">🖨️ 내보내기</button>
         <button id="spellCheckBtn" title="선택한 문장(또는 지금 문단)을 복사해서 바른한글 맞춤법 검사 사이트로 이동">✅ 맞춤법 검사</button>
+        <button id="sourcesBtn" title="이 조사에 쓰인 링크를 모아보기">📚 출처 모아보기</button>
       </div>
 
       <div id="searchBox">
@@ -569,10 +637,24 @@
         <button id="ccpCloseBtn">닫기</button>
       </div>
 
+      <div id="infoPopover"></div>
+
       <div id="spellPopover">
         <h4>맞춤법 검사 결과</h4>
         <div id="spellResults"></div>
         <button class="sp-close" id="spellCloseBtn">닫기</button>
+      </div>
+
+      <div id="tableMenu">
+        <button type="button" data-tbl-action="addRowAbove">➕ 위에 행 추가</button>
+        <button type="button" data-tbl-action="addRowBelow">➕ 아래에 행 추가</button>
+        <button type="button" data-tbl-action="delRow" class="danger">➖ 이 행 삭제</button>
+        <hr>
+        <button type="button" data-tbl-action="addColLeft">➕ 왼쪽에 열 추가</button>
+        <button type="button" data-tbl-action="addColRight">➕ 오른쪽에 열 추가</button>
+        <button type="button" data-tbl-action="delCol" class="danger">➖ 이 열 삭제</button>
+        <hr>
+        <button type="button" data-tbl-action="delTable" class="danger">🗑 표 전체 삭제</button>
       </div>
 
       <div class="doc-scroll">
@@ -1019,8 +1101,10 @@
   $('#fbEditLink').addEventListener('click', showSetupScreen);
 
   // ---------- login ----------
-  async function doLogin(){
-    const name = $('#nameInput').value.trim();
+  const LAST_NAME_KEY = 'tamgu-last-name';
+
+  async function doLogin(nameOverride){
+    const name = (nameOverride || $('#nameInput').value.trim());
     if(!name){ showToast('이름을 입력해주세요'); return; }
     let p = await loadProfile(name);
     if(!p){ p = makeDefaultProfile(name); p.updatedAt = Date.now(); }
@@ -1031,10 +1115,11 @@
     $('#userNameLabel').textContent = profile.name;
     $('#avatarInitial').textContent = profile.name.slice(0,1);
     if(!profile.tabs.find(t=>t.id===profile.activeTabId)) profile.activeTabId = profile.tabs[0].id;
+    try{ localStorage.setItem(LAST_NAME_KEY, profile.name); }catch(e){}
     startSyncPolling();
     await switchToTab(profile.activeTabId);
   }
-  $('#loginBtn').addEventListener('click', doLogin);
+  $('#loginBtn').addEventListener('click', ()=>doLogin());
   $('#nameInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doLogin(); });
 
   $('#logoutBtn').addEventListener('click', ()=>{
@@ -1043,6 +1128,7 @@
     $('#app').classList.remove('active');
     $('#loginScreen').style.display = 'flex';
     $('#nameInput').value = '';
+    try{ localStorage.removeItem(LAST_NAME_KEY); }catch(e){}
     stopSyncPolling();
   });
 
@@ -1077,6 +1163,13 @@
   updateStorageModeHint();
   if(STORAGE_MODE === 'local' && !window.storage && localStorage.getItem(FB_SKIP_KEY) !== 'skipped'){
     showSetupScreen();
+  } else {
+    let rememberedName = null;
+    try{ rememberedName = localStorage.getItem(LAST_NAME_KEY); }catch(e){}
+    if(rememberedName){
+      $('#nameInput').value = rememberedName;
+      doLogin(rememberedName);
+    }
   }
 
   // ---------- tabs ----------
@@ -1088,22 +1181,56 @@
     const rail = $('#tabRail');
     $$('.tab-item', rail).forEach(el => el.remove());
     const addBtn = $('#addTabBtn');
-    profile.tabs.forEach(tab=>{
+    const sorted = profile.tabs.slice().sort((a,b)=>{
+      const pa = a.pinned ? 1 : 0, pb = b.pinned ? 1 : 0;
+      return pb - pa;
+    });
+    sorted.forEach(tab=>{
       const item = document.createElement('div');
-      item.className = 'tab-item' + (tab.id === profile.activeTabId ? ' active' : '');
+      item.className = 'tab-item' + (tab.id === profile.activeTabId ? ' active' : '') + (tab.pinned ? ' pinned' : '');
       const sharedBadge = tab.shared ? `<span class="shared-badge" title="${escapeHtml((tab.shared.collaborators||[]).join(', '))}님과 함께 편집 중">👥</span>` : '';
+      const emojiSpan = tab.emoji ? `<span class="tab-emoji">${tab.emoji}</span>` : '';
       item.innerHTML = `<span class="swatch" style="background:${tab.color}"></span>
+        ${emojiSpan}
         <span class="label">${escapeHtml(tab.title || tab.name || '제목 없는 조사')}</span>
         ${sharedBadge}
+        <span class="emoji-tab" title="아이콘 지정">🙂</span>
+        <span class="pin-tab" title="${tab.pinned ? '고정 해제' : '위쪽에 고정'}">📌</span>
+        <span class="dup-tab" title="탭 복제">⧉</span>
         <span class="share-tab" title="다른 사람과 공유">🔗</span>
         <span class="del-tab" title="삭제">✕</span>`;
       item.addEventListener('click', (e)=>{
-        if(e.target.classList.contains('del-tab') || e.target.classList.contains('share-tab')) return;
+        if(e.target.closest('.del-tab, .share-tab, .pin-tab, .dup-tab, .emoji-tab')) return;
         switchToTab(tab.id);
       });
       $('.share-tab', item).addEventListener('click', (e)=>{
         e.stopPropagation();
         shareTab(tab);
+      });
+      $('.pin-tab', item).addEventListener('click', (e)=>{
+        e.stopPropagation();
+        tab.pinned = !tab.pinned;
+        renderTabs(); scheduleSave();
+      });
+      $('.dup-tab', item).addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const copy = JSON.parse(JSON.stringify(tab));
+        copy.id = uid();
+        copy.pinned = false;
+        copy.shared = null; // duplicates start as private copies, not linked to the shared original
+        copy.blocks = copy.blocks.map(b => ({ ...b, id: uid() }));
+        copy.title = (tab.title || tab.name || '제목 없는 조사') + ' 사본';
+        const idx = profile.tabs.indexOf(tab);
+        profile.tabs.splice(idx+1, 0, copy);
+        renderTabs(); scheduleSave();
+        showToast('탭을 복제했어요');
+      });
+      $('.emoji-tab', item).addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const input = prompt('탭에 붙일 아이콘(이모지)을 입력해주세요 (예: 📚 🔬 💡 🗂️)', tab.emoji || '');
+        if(input === null) return;
+        tab.emoji = input.trim().slice(0,2);
+        renderTabs(); scheduleSave();
       });
       $('.del-tab', item).addEventListener('click', (e)=>{
         e.stopPropagation();
@@ -1117,6 +1244,25 @@
       rail.insertBefore(item, addBtn);
     });
   }
+
+  // ---------- search across all tabs ----------
+  $('#tabSearchInput').addEventListener('input', (e)=>{
+    const q = e.target.value.trim().toLowerCase();
+    const items = $$('.tab-item', $('#tabRail'));
+    if(!q){
+      items.forEach(el=> el.classList.remove('search-hidden','search-match'));
+      return;
+    }
+    const sorted = profile.tabs.slice().sort((a,b)=> (b.pinned?1:0) - (a.pinned?1:0));
+    items.forEach((el, i)=>{
+      const tab = sorted[i];
+      if(!tab){ return; }
+      const text = (tab.title||'') + ' ' + (tab.blocks||[]).map(b=>(b.html||'').replace(/<[^>]+>/g,' ')).join(' ');
+      const match = text.toLowerCase().includes(q);
+      el.classList.toggle('search-hidden', !match);
+      el.classList.toggle('search-match', match);
+    });
+  });
 
   async function switchToTab(tabId){
     detachActiveSharedListener();
@@ -1363,6 +1509,7 @@
       + '<button type="button" data-align-btn="center" title="가운데 배치">▣</button>'
       + '<button type="button" data-align-btn="right" title="오른쪽에 배치 (글이 옆으로 흘러요)">◨</button>'
       + '<button type="button" data-align-btn="block" title="전체 너비">▭</button>'
+      + '<button type="button" data-img-delete title="사진 삭제">🗑</button>'
       + '</span>'
       + '<span class="img-resize-handle"></span>'
       + '</span>&#8203;';
@@ -1467,6 +1614,13 @@
     }
 
     if(e.key === 'Backspace'){
+      if(tryDeleteEmbedBeforeCaret(el)){
+        e.preventDefault();
+        block.html = el.innerHTML;
+        updateWordCount();
+        scheduleSave();
+        return;
+      }
       const {atStart} = getCaretOffset(el);
       if(atStart && isListType && el.textContent.length===0){
         e.preventDefault();
@@ -1669,6 +1823,17 @@
 
   // ---------- image embed: align + resize ----------
   $('#outline').addEventListener('click', (e)=>{
+    const delBtn = e.target.closest('[data-img-delete]');
+    if(delBtn){
+      e.preventDefault(); e.stopPropagation();
+      const embed = delBtn.closest('.img-embed');
+      if(embed){
+        const contentEl = embed.closest('.content');
+        embed.remove();
+        if(contentEl) syncContentAncestor(contentEl);
+      }
+      return;
+    }
     const btn = e.target.closest('[data-align-btn]');
     if(!btn) return;
     e.preventDefault(); e.stopPropagation();
@@ -1676,6 +1841,95 @@
     if(!embed) return;
     embed.dataset.align = btn.dataset.alignBtn;
     syncContentAncestor(embed);
+  });
+
+  // best-effort: let Backspace remove an image/table/divider sitting right
+  // before the caret (contenteditable is notoriously unreliable at this natively)
+  function nodeImmediatelyBeforeCaret(el){
+    const sel = window.getSelection();
+    if(!sel.rangeCount) return null;
+    const range = sel.getRangeAt(0);
+    if(!range.collapsed) return null;
+    const container = range.startContainer;
+    const offset = range.startOffset;
+    if(container.nodeType === 3){
+      const before = container.textContent.slice(0, offset).replace(/\u200B/g, '');
+      if(before.length > 0) return null;
+      if(container.previousSibling) return container.previousSibling;
+      let p = container.parentNode;
+      while(p && p !== el && !p.previousSibling){ p = p.parentNode; }
+      return (p && p !== el) ? p.previousSibling : null;
+    }
+    if(offset === 0) return null;
+    return container.childNodes[offset - 1];
+  }
+  function tryDeleteEmbedBeforeCaret(el){
+    const node = nodeImmediatelyBeforeCaret(el);
+    if(node && node.nodeType === 1 && (node.classList?.contains('img-embed') || node.tagName === 'TABLE' || node.tagName === 'HR')){
+      node.remove();
+      return true;
+    }
+    return false;
+  }
+
+  // ---------- table right-click menu ----------
+  let tableMenuCell = null;
+  $('#outline').addEventListener('contextmenu', (e)=>{
+    const cell = e.target.closest('td, th');
+    if(!cell) return;
+    e.preventDefault();
+    tableMenuCell = cell;
+    const menu = $('#tableMenu');
+    menu.style.display = 'block';
+    let left = Math.min(e.clientX, window.innerWidth - 200);
+    let top = Math.min(e.clientY, window.innerHeight - 300);
+    menu.style.left = left + 'px';
+    menu.style.top = top + 'px';
+  });
+  document.addEventListener('click', (e)=>{
+    const menu = $('#tableMenu');
+    if(menu.style.display === 'block' && !menu.contains(e.target)){
+      menu.style.display = 'none';
+    }
+  });
+  $('#tableMenu').addEventListener('click', (e)=>{
+    const btn = e.target.closest('[data-tbl-action]');
+    if(!btn || !tableMenuCell) return;
+    const cell = tableMenuCell;
+    const row = cell.closest('tr');
+    const table = cell.closest('table');
+    const cellIndex = Array.from(row.children).indexOf(cell);
+    const action = btn.dataset.tblAction;
+    const contentEl = cell.closest('.content');
+
+    if(action === 'addRowAbove' || action === 'addRowBelow'){
+      const cols = row.children.length;
+      const newRow = document.createElement('tr');
+      for(let i=0;i<cols;i++){ const td = document.createElement('td'); td.innerHTML='&nbsp;'; newRow.appendChild(td); }
+      row.parentNode.insertBefore(newRow, action === 'addRowAbove' ? row : row.nextSibling);
+    } else if(action === 'delRow'){
+      const rows = table.querySelectorAll('tr');
+      if(rows.length <= 1){ showToast('마지막 행은 남겨둘게요'); }
+      else row.remove();
+    } else if(action === 'addColLeft' || action === 'addColRight'){
+      table.querySelectorAll('tr').forEach(tr=>{
+        const refCell = tr.children[cellIndex];
+        const isHeaderRow = refCell && refCell.tagName === 'TH';
+        const newCell = document.createElement(isHeaderRow ? 'th' : 'td');
+        newCell.innerHTML = '&nbsp;';
+        tr.insertBefore(newCell, action === 'addColLeft' ? refCell : refCell.nextSibling);
+      });
+    } else if(action === 'delCol'){
+      const firstRowCols = table.querySelector('tr').children.length;
+      if(firstRowCols <= 1){ showToast('마지막 열은 남겨둘게요'); }
+      else table.querySelectorAll('tr').forEach(tr=>{ if(tr.children[cellIndex]) tr.children[cellIndex].remove(); });
+    } else if(action === 'delTable'){
+      table.remove();
+    }
+
+    $('#tableMenu').style.display = 'none';
+    if(contentEl) syncContentAncestor(contentEl);
+    tableMenuCell = null;
   });
 
   let resizingEmbed = null, resizeStartX = 0, resizeStartW = 0;
@@ -1743,6 +1997,11 @@
     if(pop.style.display === 'block' && !pop.contains(e.target) && e.target.id !== 'charCountBtn'){
       pop.style.display = 'none';
     }
+    const infoPop = $('#infoPopover');
+    if(infoPop.style.display === 'block' && !infoPop.contains(e.target) && e.target.id !== 'shortcutsBtn' && e.target.id !== 'sourcesBtn'){
+      infoPop.style.display = 'none';
+      infoPop.style.transform = '';
+    }
   });
 
   // ---------- search ----------
@@ -1762,8 +2021,9 @@
   $('#searchInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doFind(e.shiftKey); });
 
   // ---------- export to PDF / print ----------
-  function buildPrintHtml(tab){
-    let html = '<h1 class="print-title">' + escapeHtml(tab.title || '제목 없는 조사') + '</h1>';
+  function buildPrintHtml(tab, docTitle, docAuthor){
+    let html = '<div class="print-doc-title">' + escapeHtml(docTitle) + '</div>';
+    if(docAuthor) html += '<div class="print-doc-author">' + escapeHtml(docAuthor) + '</div>';
     tab.blocks.forEach((block, idx)=>{
       const indent = block.level * 22;
       let marker = '';
@@ -1783,10 +2043,17 @@
   $('#exportPdfBtn').addEventListener('click', ()=>{
     const tab = getActiveTab();
     if(!tab){ showToast('내보낼 조사가 없어요'); return; }
-    $('#printArea').innerHTML = buildPrintHtml(tab);
+
+    const docTitle = prompt('문서 제목을 입력해주세요', tab.title || '');
+    if(docTitle === null) return;
+    const docAuthor = prompt('작성자 이름을 입력해주세요 (비워두면 표시 안 함)', profile ? profile.name : '');
+    if(docAuthor === null) return;
+
+    $('#printArea').innerHTML = buildPrintHtml(tab, docTitle || '제목 없음', (docAuthor||'').trim());
     originalDocTitle = document.title;
-    document.title = tab.title || tab.name || '탐구노트';
-    window.print();
+    document.title = docTitle || tab.title || tab.name || '생각 정리 노트';
+    showToast('인쇄창에서 "자세히" → "머리글과 바닥글" 체크를 꺼주시면 날짜·주소 없이 깔끔하게 나와요');
+    setTimeout(()=> window.print(), 400);
   });
   window.addEventListener('afterprint', ()=>{ document.title = originalDocTitle; });
 
@@ -1925,6 +2192,133 @@
     if(pop.style.display === 'block' && !pop.contains(e.target) && e.target.id !== 'spellCheckBtn'){
       pop.style.display = 'none';
     }
+  });
+
+  // ---------- collect all links used in this tab as a source list ----------
+  $('#sourcesBtn').addEventListener('click', (e)=>{
+    const tab = getActiveTab();
+    if(!tab){ showToast('열려있는 조사가 없어요'); return; }
+    const links = [];
+    const seen = new Set();
+    tab.blocks.forEach(b=>{
+      const div = document.createElement('div');
+      div.innerHTML = b.html || '';
+      div.querySelectorAll('a[href]').forEach(a=>{
+        const href = a.getAttribute('href');
+        if(href && !seen.has(href)){ seen.add(href); links.push({ href, text: a.textContent || href }); }
+      });
+    });
+    const pop = $('#infoPopover');
+    if(!links.length){
+      pop.innerHTML = '<div class="sp-empty">이 조사에는 아직 링크가 없어요</div><button id="ccpCloseBtn3">닫기</button>';
+    } else {
+      const rows = links.map((l,i) => `<div class="ccp-row" style="display:block;"><b style="display:block;font-size:12.5px;">${i+1}. ${escapeHtml(l.text)}</b><a href="${escapeHtml(l.href)}" target="_blank" style="font-size:11.5px;color:var(--linkblue);word-break:break-all;">${escapeHtml(l.href)}</a></div>`).join('');
+      pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">이 조사의 출처 (' + links.length + '개)</h4>' + rows + '<button id="ccpCloseBtn3">닫기</button>';
+    }
+    pop.style.display = 'block';
+    pop.style.width = '320px';
+    pop.style.maxHeight = '400px';
+    const rect = e.target.getBoundingClientRect();
+    pop.style.transform = '';
+    pop.style.left = Math.max(10, Math.min(rect.left, window.innerWidth-330)) + 'px';
+    pop.style.top = Math.min(rect.bottom+8, window.innerHeight-420) + 'px';
+    $('#ccpCloseBtn3', pop).addEventListener('click', ()=>{ pop.style.display='none'; });
+  });
+
+  // ---------- dark mode ----------
+  const DARK_MODE_KEY = 'tamgu-dark-mode';
+  function applyDarkMode(on){
+    document.body.classList.toggle('dark', on);
+    $('#darkModeBtn').textContent = on ? '☀️' : '🌙';
+  }
+  $('#darkModeBtn').addEventListener('click', ()=>{
+    const on = !document.body.classList.contains('dark');
+    applyDarkMode(on);
+    try{ localStorage.setItem(DARK_MODE_KEY, on ? '1' : '0'); }catch(e){}
+  });
+  try{ applyDarkMode(localStorage.getItem(DARK_MODE_KEY) === '1'); }catch(e){}
+
+  // ---------- focus mode ----------
+  $('#focusModeBtn').addEventListener('click', ()=>{
+    document.body.classList.toggle('focus-mode');
+    showToast(document.body.classList.contains('focus-mode') ? '집중 모드 켜짐 — 다시 누르면 꺼져요' : '집중 모드 꺼짐');
+  });
+
+  // ---------- shortcuts help ----------
+  $('#shortcutsBtn').addEventListener('click', ()=>{
+    const lines = [
+      ['Tab / Shift+Tab', '하위로 들여쓰기 / 다시 내어쓰기'],
+      ['Enter', '같은 칸에서 줄바꿈'],
+      ['Enter (빈 줄에서 한번 더)', '새 칸 만들기'],
+      ['1. 또는 - 또는 []', '자동으로 번호·글머리·체크박스 목록'],
+      ['# / ## / ###', '자동으로 제목 1/2/3'],
+      ['Ctrl+B / I / U', '굵게 / 기울임 / 밑줄'],
+      ['드래그 후 🔗', '링크 삽입'],
+      ['이미지 위 🗑', '이미지 삭제'],
+      ['표 안에서 우클릭', '행·열 추가/삭제, 표 삭제'],
+    ];
+    const body = lines.map(([k,v])=>`<div class="ccp-row" style="display:flex;justify-content:space-between;gap:14px;"><span>${escapeHtml(k)}</span><b>${escapeHtml(v)}</b></div>`).join('');
+    const pop = $('#infoPopover');
+    pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">단축키 안내</h4>' + body + '<button id="ccpCloseBtn2">닫기</button>';
+    pop.style.display = 'block';
+    pop.style.left = '50%'; pop.style.top = '50%';
+    pop.style.transform = 'translate(-50%,-50%)';
+    pop.style.width = '320px';
+    pop.style.maxHeight = '80vh';
+    $('#ccpCloseBtn2', pop).addEventListener('click', ()=>{ pop.style.display='none'; pop.style.transform=''; });
+  });
+
+  // ---------- backup: export / import whole profile as JSON ----------
+  $('#backupBtn').addEventListener('click', ()=>{
+    if(!profile){ showToast('먼저 로그인해주세요'); return; }
+    const choice = confirm('전체 노트를 JSON 파일로 내보낼까요?\n(취소를 누르면 대신 파일을 불러올 수 있어요)');
+    if(choice){
+      const blob = new Blob([JSON.stringify(profile, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = (profile.name || 'note') + '-백업.json';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showToast('백업 파일을 내려받았어요');
+    } else {
+      $('#backupFileInput').click();
+    }
+  });
+  $('#backupFileInput').addEventListener('change', (e)=>{
+    const file = e.target.files[0];
+    e.target.value = '';
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      try{
+        const data = JSON.parse(reader.result);
+        if(!data || !Array.isArray(data.tabs)){ showToast('올바른 백업 파일이 아니에요'); return; }
+        if(!confirm('지금 있는 노트에 불러온 탭들을 추가할까요? (기존 내용은 지워지지 않아요)')) return;
+        data.tabs.forEach(t=>{
+          t.id = uid();
+          (t.blocks||[]).forEach(b=> b.id = uid());
+          profile.tabs.push(t);
+        });
+        renderTabs(); scheduleSave();
+        showToast('불러왔어요');
+      }catch(err){ showToast('파일을 읽지 못했어요'); }
+    };
+    reader.readAsText(file);
+  });
+
+  // ---------- ask Claude about this note ----------
+  $('#askClaudeBtn').addEventListener('click', async ()=>{
+    const tab = getActiveTab();
+    if(!tab){ showToast('먼저 조사를 열어주세요'); return; }
+    const plainText = tab.blocks.map(b => (b.html||'').replace(/<[^>]+>/g,' ')).join('\n').replace(/\n{2,}/g,'\n').trim();
+    const prompt = '다음은 제가 정리한 노트예요. 이 내용을 같이 살펴보고 도와주세요.\n\n제목: ' + (tab.title||'제목 없음') + '\n\n' + plainText;
+    try{ await navigator.clipboard.writeText(prompt); }catch(e){}
+    window.location.href = 'claude://claude.ai/new?q=' + encodeURIComponent(prompt);
+    setTimeout(()=>{ window.open('https://claude.ai/new', '_blank'); }, 600);
+    showToast('노트 내용이 복사됐어요. Claude 앱이 있으면 바로 열리고, 없으면 새 탭에서 붙여넣기(Ctrl+V) 해주세요');
   });
 
   window.addEventListener('beforeunload', ()=>{ if(profile) saveProfile(); });
