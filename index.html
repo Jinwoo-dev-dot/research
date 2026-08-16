@@ -6,7 +6,7 @@
 <title>생각 정리 노트</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Gowun+Batang&family=Nanum+Pen+Script&family=Jua&family=Nanum+Gothic:wght@400;700;800&family=Song+Myung&family=Gowun+Dodum&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Gowun+Batang&family=Nanum+Pen+Script&family=Jua&family=Nanum+Gothic:wght@400;700;800&family=Song+Myung&family=Gowun+Dodum&family=Caveat:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+KR:wght@400;600;700&family=Nanum+Myeongjo:wght@400;700;800&family=Nanum+Brush+Script&family=Nanum+Gothic+Coding:wght@400;700&family=Do+Hyeon&family=Black+Han+Sans&family=East+Sea+Dokdo&family=Poor+Story&family=Yeon+Sung&family=Stylish&family=Single+Day&family=Sunflower:wght@300;500;700&family=Kirang+Haerang&family=Gugi&family=Gamja+Flower&family=Hi+Melody&family=Jeju+Hallasan&family=Jeju+Gothic&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 <style>
@@ -26,24 +26,54 @@
     --line-soft: rgba(59,50,38,0.08);
     --linkblue:#1a56db;
     --shadow: 0 8px 24px rgba(59,50,38,0.14);
+    --default-content-font: 'Gowun Dodum', sans-serif;
+    --default-content-size: 16px;
   }
   body.dark{
-    --canvas:#221E19;
-    --canvas2:#2B2620;
-    --ink:#EFE7DA;
-    --ink-soft:#B8AE9E;
-    --ink-faint:#8A8074;
-    --paper:#2A2520;
-    --terracotta:#E0916A;
-    --sage:#9BBE92;
-    --dusty:#8FB1CE;
-    --mustard:#E3BD6C;
-    --plum:#C08CB0;
-    --line: rgba(239,231,218,0.16);
-    --line-soft: rgba(239,231,218,0.08);
-    --linkblue:#7fa8f5;
-    --shadow: 0 8px 24px rgba(0,0,0,0.4);
+    --canvas:#111110;
+    --canvas2:#181816;
+    --ink:#E9E4D8;
+    --ink-soft:#948C7C;
+    --ink-faint:#5E584C;
+    --paper:#1A1917;
+    --terracotta:#E2916A;
+    --sage:#8FBE8C;
+    --dusty:#7EA8CE;
+    --mustard:#E0BD6C;
+    --plum:#BE8CB2;
+    --line: rgba(233,228,216,0.10);
+    --line-soft: rgba(233,228,216,0.05);
+    --linkblue:#82a9f5;
+    --shadow: 0 14px 38px rgba(0,0,0,0.6);
   }
+  body.dark::before{
+    background-image:
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.35) 0px, rgba(0,0,0,0.35) 1px, transparent 1px, transparent 3px),
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.28) 0px, rgba(0,0,0,0.28) 1px, transparent 1px, transparent 3px);
+  }
+  body.dark .swash{ opacity:0.09; filter: blur(34px); }
+  body.dark .noise{ opacity:0.035; }
+  body.dark header.topbar{ background: rgba(17,17,16,0.78); }
+  body.dark .tab-rail{ background: rgba(17,17,16,0.4); }
+  body.dark .toolbar{ background: rgba(17,17,16,0.55); }
+  body.dark .footer-bar{ background: rgba(17,17,16,0.5); }
+  body.dark .login-card,
+  body.dark .ws-card,
+  body.dark .tab-item.active,
+  body.dark #charCountPopover,
+  body.dark #infoPopover,
+  body.dark #spellPopover,
+  body.dark #tableMenu,
+  body.dark #cmdPalette .cmd-box{
+    box-shadow: 0 14px 38px rgba(0,0,0,0.55);
+  }
+  body.dark .login-card button{ box-shadow: 3px 3px 0 rgba(0,0,0,0.6); }
+  body.dark .login-card button:hover{ box-shadow: 5px 5px 0 rgba(0,0,0,0.6); }
+  body.dark .toast{ background:#050505; }
+  body.dark .row[data-type="code"] .content{ background: rgba(0,0,0,0.35); }
+  body.dark .row .content code.inline-code{ background: rgba(0,0,0,0.4); }
+  body.dark .row .content table th{ background: rgba(0,0,0,0.3); }
+  body.dark .row[data-type="quote"]{ background: rgba(226,145,106,0.07); }
   body.focus-mode .tab-rail, body.focus-mode .toolbar, body.focus-mode #searchBox{ display:none !important; }
   body.focus-mode .doc-wrap{ max-width:640px; }
   *{box-sizing:border-box;}
@@ -249,6 +279,16 @@
     font-family:'Gowun Dodum',sans-serif; font-size:12.5px; outline:none;
   }
   .tab-search-input:focus{ border-color:var(--terracotta); }
+  .pinned-note-wrap{ margin-bottom:10px; }
+  .pinned-note-label{
+    font-size:11.5px; color:var(--ink-soft); cursor:pointer; padding:6px 8px; border-radius:10px;
+    display:flex; align-items:center; justify-content:space-between; user-select:none;
+  }
+  .pinned-note-label:hover{ background:rgba(255,255,255,0.5); color:var(--ink); }
+  .pinned-note-textarea{ display:none; min-height:64px; resize:vertical; margin-bottom:0; }
+  .pinned-note-wrap.expanded .pinned-note-textarea{ display:block; margin-top:4px; }
+  .pinned-note-wrap.expanded #pinnedNoteArrow{ transform:rotate(180deg); display:inline-block; }
+  .pinned-note-wrap.has-note .pinned-note-label{ color:var(--terracotta); }
   .tab-item .pin-tab, .tab-item .dup-tab, .tab-item .emoji-tab{
     opacity:0; font-size:12px; color:var(--ink-soft); cursor:pointer; padding:2px 3px; flex-shrink:0;
   }
@@ -385,8 +425,12 @@
   .row[data-type="todo"] .marker{ margin-top:4px; flex-shrink:0; cursor:pointer; }
   .row[data-type="todo"] .marker input{ width:16px;height:16px; accent-color: var(--terracotta); cursor:pointer; }
   .row[data-type="todo"].checked .content{ color:var(--ink-faint); text-decoration: line-through; }
-  .row .content{ flex:1; outline:none; padding: 4px 4px; font-size:16px; line-height:1.7; min-height: 24px; color: var(--ink); word-break: break-word; }
+  .row .content{ flex:1; outline:none; padding: 4px 4px; font-size: var(--default-content-size, 16px); font-family: var(--default-content-font, 'Gowun Dodum', sans-serif); line-height:1.7; min-height: 24px; color: var(--ink); word-break: break-word; }
   .row .content a{ color: var(--linkblue) !important; text-decoration:underline !important; cursor:pointer; }
+  .row .content a.file-attach{
+    display:inline-block; text-decoration:none !important; background:rgba(59,50,38,0.07);
+    border:1px solid var(--line); border-radius:8px; padding:2px 9px; font-size:13.5px; color:var(--ink) !important;
+  }
   .row .content code.inline-code{ background: rgba(59,50,38,0.08); border:1px solid var(--line-soft); border-radius:5px; padding:1px 6px; font-family:'Courier New',monospace; font-size:14px; }
   .row .content table{ border-collapse:collapse; margin:8px 0; width:100%; }
   .row .content table td, .row .content table th{ border:1.5px solid var(--ink); padding:7px 10px; font-size:14.5px; min-width:70px; }
@@ -445,28 +489,196 @@
   .toast.show{ opacity:1; transform: translateX(-50%) translateY(0); }
 
   #printArea{ display:none; }
+  @page{ size: auto; margin: 0; }
   @media print{
     body *{ visibility:hidden; }
     #printArea, #printArea *{ visibility:visible; }
-    #printArea{ display:block; position:absolute; top:0; left:0; width:100%; padding:10px 20px; }
+    #printArea{
+      display:block; position:absolute; top:0; left:0; right:0;
+      width:auto; max-width:194mm; margin:0 auto;
+      padding:20mm 0 16mm;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
     .print-doc-title{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:26px; margin:0 0 6px; color:#2a2318; text-align:center; }
     .print-doc-author{ font-size:13px; color:#555; text-align:center; margin:0 0 22px; }
-    .print-row{ display:flex; gap:7px; align-items:flex-start; font-size:13px; line-height:1.65; color:#222; margin-bottom:3px; }
+    .print-row{
+      display:flex; gap:7px; align-items:flex-start; font-size:16px; line-height:1.7; color:#222; margin-bottom:6px;
+      break-inside: avoid-page; page-break-inside: avoid;
+    }
     .print-marker{ flex-shrink:0; color:#555; }
-    .print-content{ flex:1; word-break:break-word; }
-    .print-type-h1 .print-content{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:18px; font-weight:700; margin-top:10px; }
-    .print-type-h2 .print-content{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:15.5px; font-weight:700; margin-top:8px; }
-    .print-type-h3 .print-content{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:14px; font-weight:700; color:#a1583a; margin-top:6px; }
+    .print-content{ flex:1; word-break:break-word; white-space:pre-wrap; }
+    .print-type-h1, .print-type-h2, .print-type-h3{ break-after: avoid-page; page-break-after: avoid; }
+    .print-type-h1 .print-content{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:22px; font-weight:700; margin-top:14px; }
+    .print-type-h2 .print-content{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:18px; font-weight:700; margin-top:11px; }
+    .print-type-h3 .print-content{ font-family:'Jua','Nanum Gothic',sans-serif; font-size:16px; font-weight:700; color:#a1583a; margin-top:9px; }
     .print-type-quote{ border-left:3px solid #a1583a; padding-left:8px; font-style:italic; color:#555; }
     .print-type-code .print-content{ font-family:'Courier New',monospace; background:#f1f1f1; padding:4px 6px; border-radius:4px; }
     .print-checked .print-content{ text-decoration:line-through; color:#888; }
     .print-content img{ max-width:100%; }
     .print-content table{ border-collapse:collapse; margin:4px 0; }
     .print-content table td, .print-content table th{ border:1px solid #333; padding:4px 8px; font-size:12px; }
-    .print-content a{ color:#1a56db; text-decoration:underline; }
     .print-content code.inline-code{ background:#eee; padding:1px 5px; border-radius:4px; font-family:'Courier New',monospace; }
     .img-toolbar, .img-resize-handle{ display:none !important; }
   }
+
+  /* ---------- workspace (큰 탭) screen ---------- */
+  #workspaceScreen{ position:relative; z-index:2; height:100vh; display:none; align-items:center; justify-content:center; animation: fadeIn .4s ease; }
+  #workspaceScreen.active{ display:flex; }
+  .ws-shell{ width:840px; max-width:92vw; }
+  .ws-header{ display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:10px; }
+  .ws-header h1{ font-family:'Caveat',sans-serif; font-weight:700; font-size:36px; margin:0; color:var(--ink); }
+  .ws-header .ws-sub{ font-size:13px; color:var(--ink-soft); margin-top:4px; }
+  .ws-header .ws-user{ font-size:13px; color:var(--ink-soft); display:flex; align-items:center; gap:10px; }
+  .ws-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:16px; max-height:64vh; overflow-y:auto; padding:6px 4px; }
+  .ws-card{
+    background:var(--paper); border:2.5px solid var(--ink); border-radius:20px;
+    padding:22px 16px 18px; cursor:pointer; position:relative; box-shadow:3px 3px 0 rgba(59,50,38,0.18);
+    transition: transform .12s ease, box-shadow .12s ease; text-align:center;
+  }
+  .ws-card:hover{ transform:translate(-2px,-2px); box-shadow:5px 5px 0 rgba(59,50,38,0.22); }
+  .ws-card .ws-emoji{ font-size:34px; margin-bottom:8px; }
+  .ws-card .ws-name{ font-family:'Jua',sans-serif; font-size:15.5px; color:var(--ink); word-break:break-word; }
+  .ws-card .ws-sub2{ font-size:11px; color:var(--ink-faint); margin-top:6px; }
+  .ws-card .ws-dot{ width:10px;height:10px;border-radius:50%; position:absolute; top:14px; left:14px; border:1.5px solid var(--ink); }
+  .ws-card .ws-edit, .ws-card .ws-del{
+    position:absolute; top:9px; font-size:12px; color:var(--ink-soft); opacity:0; cursor:pointer;
+    width:22px;height:22px; display:flex; align-items:center; justify-content:center; border-radius:8px;
+  }
+  .ws-card .ws-edit{ right:33px; }
+  .ws-card .ws-del{ right:8px; }
+  .ws-card:hover .ws-edit, .ws-card:hover .ws-del{ opacity:0.6; }
+  .ws-card .ws-edit:hover, .ws-card .ws-del:hover{ opacity:1; background:rgba(59,50,38,0.08); }
+  .ws-card.add-card{ border-style:dashed; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--ink-soft); box-shadow:none; min-height:118px; }
+  .ws-card.add-card:hover{ color:var(--terracotta); border-color:var(--terracotta); transform:none; }
+  #wsBackBtn{ display:none; }
+
+  /* ---------- todo progress bar in tab list ---------- */
+  .tab-progress-wrap{ width:100%; height:4px; background:rgba(59,50,38,0.1); border-radius:3px; margin-top:5px; overflow:hidden; }
+  .tab-progress-wrap .bar{ height:100%; background:var(--sage); border-radius:3px; transition:width .2s ease; }
+  .tab-item-col{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+  .tab-item-col .label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  /* ---------- row background (포스트잇) ---------- */
+  .row[data-bg]{ border-radius:8px; }
+  .row-bg-swatches{ display:flex; gap:4px; align-items:center; }
+
+  /* duplicate-row icon in gutter */
+  .row .dup-row{ opacity:0; font-size:11px; color:var(--ink-soft); cursor:pointer; padding:2px; margin-top:4px; }
+  .row:hover .dup-row{ opacity:0.45; }
+  .row .dup-row:hover{ opacity:1; color:var(--terracotta); }
+  .row .star-row{ opacity:0; font-size:11px; color:var(--ink-soft); cursor:pointer; padding:2px; margin-top:4px; }
+  .row:hover .star-row{ opacity:0.45; }
+  .row .star-row:hover{ opacity:1; color:var(--mustard); }
+  .row .star-row.active{ opacity:1; color:var(--mustard); }
+  .row .move-row{ opacity:0; font-size:9px; color:var(--ink-soft); cursor:pointer; padding:1px 2px; line-height:1; }
+  .row:hover .move-row{ opacity:0.4; }
+  .row .move-row:hover{ opacity:1; color:var(--sage); }
+  .row .due-row{ opacity:0; font-size:11px; color:var(--ink-soft); cursor:pointer; padding:2px; margin-top:4px; }
+  .row:hover .due-row{ opacity:0.45; }
+  .row .due-row:hover{ opacity:1; color:var(--dusty); }
+  .row .due-row.active{ opacity:1; color:var(--dusty); }
+  .due-badge{ font-size:10.5px; padding:2px 8px; border-radius:8px; margin-left:6px; margin-top:6px; flex-shrink:0; align-self:flex-start; white-space:nowrap; }
+  .due-badge.due-future{ background:rgba(107,135,160,0.15); color:var(--dusty); }
+  .due-badge.due-today{ background:rgba(210,162,61,0.2); color:var(--mustard); }
+  .due-badge.due-overdue{ background:rgba(193,101,63,0.16); color:var(--terracotta); }
+
+  /* ---------- command palette (Ctrl+K) ---------- */
+  #cmdPalette{ display:none; position:fixed; inset:0; z-index:90; background:rgba(20,17,12,0.45); align-items:flex-start; justify-content:center; padding-top:12vh; }
+  #cmdPalette.active{ display:flex; }
+  #cmdPalette .cmd-box{
+    width:520px; max-width:90vw; background:var(--paper); border:2.5px solid var(--ink); border-radius:16px;
+    box-shadow: var(--shadow); overflow:hidden;
+  }
+  #cmdPalette input{
+    width:100%; border:none; outline:none; padding:16px 18px; font-size:15px;
+    font-family:'Gowun Dodum',sans-serif; background:transparent; color:var(--ink);
+    border-bottom:2px solid var(--line);
+  }
+  #cmdPalette .cmd-list{ max-height:340px; overflow-y:auto; padding:6px; }
+  #cmdPalette .cmd-item{ display:flex; align-items:center; gap:9px; padding:9px 12px; border-radius:10px; cursor:pointer; font-size:13.5px; color:var(--ink); }
+  #cmdPalette .cmd-item .cmd-ws{ font-size:11px; color:var(--ink-faint); margin-left:auto; flex-shrink:0; }
+  #cmdPalette .cmd-item.sel, #cmdPalette .cmd-item:hover{ background: rgba(193,101,63,0.12); }
+  #cmdPalette .cmd-empty{ padding:20px; text-align:center; color:var(--ink-soft); font-size:13px; }
+
+  /* ---------- drag & drop image hint ---------- */
+  .doc-scroll.drag-over{ outline:3px dashed var(--terracotta); outline-offset:-8px; background: rgba(193,101,63,0.05); }
+
+  /* ---------- trash / snapshot list rows ---------- */
+  .list-row-item{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 2px; border-bottom:1px solid var(--line-soft); font-size:12.5px; }
+  .list-row-item:last-child{ border-bottom:none; }
+  .list-row-item .lri-info{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink); }
+  .list-row-item .lri-sub{ font-size:10.5px; color:var(--ink-faint); }
+  .list-row-item button{ border:1.5px solid var(--line); background:transparent; border-radius:8px; padding:4px 9px; cursor:pointer; font-size:11.5px; color:var(--ink-soft); flex-shrink:0; }
+  .list-row-item button:hover{ border-color:var(--ink); color:var(--ink); }
+
+  /* ---------- settings panel ---------- */
+  #settingsPanel{ display:none; position:fixed; inset:0; z-index:95; background:rgba(20,17,12,0.45); align-items:center; justify-content:center; }
+  #settingsPanel.active{ display:flex; }
+  .settings-box{
+    width:640px; max-width:92vw; max-height:82vh; display:flex; flex-direction:column;
+    background:var(--paper); border:2.5px solid var(--ink); border-radius:20px; box-shadow:var(--shadow); overflow:hidden;
+  }
+  .settings-head{ display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:2px solid var(--ink); }
+  .settings-head h2{ margin:0; font-family:'Jua',sans-serif; font-size:17px; color:var(--ink); }
+  .settings-x{ border:1.5px solid var(--line); background:transparent; border-radius:9px; padding:5px 10px; cursor:pointer; color:var(--ink-soft); font-size:13px; }
+  .settings-x:hover{ border-color:var(--ink); color:var(--ink); }
+  .settings-body{ overflow-y:auto; padding:6px 20px 20px; }
+  .settings-body section{ margin-top:18px; }
+  .settings-body section h3{ font-size:12px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:0.07em; margin:0 0 8px; border-bottom:1px solid var(--line-soft); padding-bottom:6px; }
+  .set-row{ display:flex; align-items:center; justify-content:space-between; gap:14px; padding:9px 2px; font-size:13.5px; color:var(--ink); border-bottom:1px solid var(--line-soft); }
+  .set-row:last-child{ border-bottom:none; }
+  .set-row select, .set-row input[type="number"], .set-row input[type="text"]{
+    border:1.5px solid var(--line); background:var(--canvas2); color:var(--ink); border-radius:9px;
+    padding:6px 9px; font-family:'Gowun Dodum',sans-serif; font-size:12.5px; outline:none;
+  }
+  .set-row button{
+    border:1.5px solid var(--line); background:transparent; color:var(--ink); border-radius:9px;
+    padding:6px 12px; font-size:12.5px; cursor:pointer; font-family:'Gowun Dodum',sans-serif; flex-shrink:0;
+  }
+  .set-row button:hover{ border-color:var(--ink); }
+  .set-row.danger-row{ }
+  .set-row .danger-btn{ border-color:var(--terracotta); color:var(--terracotta); }
+  .set-row .danger-btn:hover{ background:rgba(193,101,63,0.1); }
+  .switch{ position:relative; display:inline-block; width:38px; height:22px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .switch span{ position:absolute; inset:0; background:var(--line); border-radius:22px; cursor:pointer; transition:.15s; }
+  .switch span::before{ content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:var(--paper); border-radius:50%; transition:.15s; box-shadow:0 1px 2px rgba(0,0,0,0.3); }
+  .switch input:checked + span{ background:var(--terracotta); }
+  .switch input:checked + span::before{ transform:translateX(16px); }
+  .wsr-item, .rt-item{ display:flex; align-items:center; gap:8px; padding:6px 2px; font-size:12.5px; border-bottom:1px solid var(--line-soft); }
+  .wsr-item:last-child, .rt-item:last-child{ border-bottom:none; }
+  .wsr-item span.wsr-name, .rt-item span.rt-name{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; cursor:default; }
+  .rt-item span.rt-name{ cursor:pointer; }
+  .rt-item span.rt-name:hover{ color:var(--terracotta); }
+  .wsr-item button{ border:1.5px solid var(--line); background:transparent; border-radius:7px; padding:2px 7px; cursor:pointer; font-size:11px; color:var(--ink-soft); }
+  .wsr-item button:hover{ border-color:var(--ink); color:var(--ink); }
+
+  /* ---------- sidebar collapse ---------- */
+  body.sidebar-collapsed .tab-rail{ width:58px; padding:18px 8px; }
+  body.sidebar-collapsed .tab-rail .rail-label,
+  body.sidebar-collapsed .tab-rail .tab-search-input,
+  body.sidebar-collapsed .tab-item .label,
+  body.sidebar-collapsed .tab-item .tab-progress-wrap,
+  body.sidebar-collapsed .add-tab-btn span.add-label{ display:none; }
+  body.sidebar-collapsed .tab-item{ justify-content:center; padding:10px 6px; }
+  body.sidebar-collapsed .tab-item .pin-tab, body.sidebar-collapsed .tab-item .dup-tab,
+  body.sidebar-collapsed .tab-item .emoji-tab, body.sidebar-collapsed .tab-item .share-tab,
+  body.sidebar-collapsed .tab-item .del-tab{ display:none; }
+  body.sidebar-collapsed .add-tab-btn{ padding:9px 4px; }
+
+  /* ---------- editor width / line height variants ---------- */
+  body.doc-narrow .doc-wrap{ max-width:560px; }
+  body.doc-wide .doc-wrap{ max-width:960px; }
+  body.line-tight .row .content{ line-height:1.4; }
+  body.line-relaxed .row .content{ line-height:2.1; }
+
+  /* ---------- reader mode ---------- */
+  body.reader-mode .tab-rail, body.reader-mode .toolbar, body.reader-mode #searchBox, body.reader-mode .footer-bar{ display:none !important; }
+  body.reader-mode .doc-wrap{ max-width:660px; }
+  body.reader-mode .row .content{ font-family:'Gowun Batang',serif; font-size:18px; line-height:2.05; cursor:default; }
+  body.reader-mode .row .dup-row, body.reader-mode .row .toggle{ display:none; }
+  body.reader-mode .tab-title{ pointer-events:none; }
 </style>
 </head>
 <body>
@@ -524,18 +736,31 @@
 
 </div>
 
+<!-- WORKSPACE (큰 탭) SELECT -->
+<div id="workspaceScreen">
+  <div class="ws-shell">
+    <div class="ws-header">
+      <div>
+        <h1>어떤 주제를 열어볼까요?</h1>
+        <div class="ws-sub">먼저 큰 주제(워크스페이스)를 고르면, 그 안에서 세부 조사 탭들을 정리할 수 있어요</div>
+      </div>
+      <div class="ws-user">
+        <span id="wsUserLabel"></span>
+        <button class="logout-btn" id="wsLogoutBtn">나가기</button>
+      </div>
+    </div>
+    <div class="ws-grid" id="wsGrid"></div>
+  </div>
+</div>
+
 <!-- APP -->
 <div id="app">
   <header class="topbar">
     <div class="brand">🖋️ 생각 정리 노트</div>
     <div class="user-chip">
-      <button class="logout-btn" id="askClaudeBtn" title="이 조사 내용을 가지고 Claude에게 물어보기">🤖 Claude에게 묻기</button>
-      <button class="logout-btn" id="backupBtn" title="전체 백업/복원">📦 백업</button>
-      <button class="logout-btn" id="shortcutsBtn" title="단축키 안내">❓</button>
-      <button class="logout-btn" id="focusModeBtn" title="집중 모드 (사이드바/툴바 숨기기)">🎯</button>
-      <button class="logout-btn" id="darkModeBtn" title="어두운 화면">🌙</button>
+      <button class="logout-btn" id="wsSwitchBtn" title="워크스페이스(큰 탭) 바꾸기">🗂 워크스페이스</button>
+      <button class="logout-btn" id="settingsBtn" title="설정">⚙️ 설정</button>
       <div class="save-status" id="saveStatus"><span class="sdot"></span><span id="saveStatusText">저장됨</span></div>
-      <button class="logout-btn" id="syncBtn" title="다른 창의 최신 내용 불러오기">🔄 동기화</button>
       <div class="avatar" id="avatarInitial">?</div>
       <span id="userNameLabel"></span>
       <button class="logout-btn" id="logoutBtn">나가기</button>
@@ -544,9 +769,13 @@
 
   <div class="main-area">
     <div class="tab-rail" id="tabRail">
+      <div class="pinned-note-wrap">
+        <div class="pinned-note-label" id="pinnedNoteToggle">📌 워크스페이스 메모 <span id="pinnedNoteArrow">▾</span></div>
+        <textarea id="pinnedNoteInput" class="tab-search-input pinned-note-textarea" placeholder="빠르게 적어둘 메모..."></textarea>
+      </div>
       <input id="tabSearchInput" class="tab-search-input" type="text" placeholder="🔍 모든 조사에서 찾기..." />
       <div class="rail-label">조사 주제</div>
-      <div class="add-tab-btn" id="addTabBtn">＋ 새 조사 시작</div>
+      <div class="add-tab-btn" id="addTabBtn">＋<span class="add-label">&nbsp;새 조사 시작</span></div>
     </div>
 
     <div class="editor-pane">
@@ -570,13 +799,32 @@
         <button id="inlineCodeBtn" title="인라인 코드">&lt;/&gt;</button>
         <div class="sep"></div>
         <select id="fontSelect" title="글씨체">
-          <option value="'Gowun Dodum', sans-serif">둥근 손글씨</option>
-          <option value="'Gaegu', sans-serif">개구쟁이체</option>
-          <option value="'Jua', sans-serif">주아체</option>
-          <option value="'Nanum Pen Script', cursive">펜글씨</option>
-          <option value="'Gowun Batang', serif">고운바탕</option>
-          <option value="'Song Myung', serif">명조체</option>
-          <option value="'Nanum Gothic', sans-serif">나눔고딕</option>
+          <option value="'Gowun Dodum', 'Noto Sans KR', sans-serif">둥근 손글씨</option>
+          <option value="'Gaegu', 'Noto Sans KR', sans-serif">개구쟁이체</option>
+          <option value="'Jua', 'Noto Sans KR', sans-serif">주아체</option>
+          <option value="'Nanum Pen Script', 'Noto Sans KR', cursive">펜글씨</option>
+          <option value="'Gowun Batang', 'Noto Serif KR', serif">고운바탕</option>
+          <option value="'Song Myung', 'Noto Serif KR', serif">명조체</option>
+          <option value="'Nanum Gothic', 'Noto Sans KR', sans-serif">나눔고딕</option>
+          <option value="'Noto Sans KR', sans-serif">노토 산스</option>
+          <option value="'Noto Serif KR', serif">노토 명조</option>
+          <option value="'Nanum Myeongjo', 'Noto Serif KR', serif">나눔명조</option>
+          <option value="'Nanum Brush Script', 'Noto Sans KR', cursive">나눔손글씨 붓</option>
+          <option value="'Nanum Gothic Coding', 'Noto Sans KR', monospace">나눔고딕 코딩</option>
+          <option value="'Do Hyeon', 'Noto Sans KR', sans-serif">도현체</option>
+          <option value="'Black Han Sans', 'Noto Sans KR', sans-serif">검은고딕</option>
+          <option value="'East Sea Dokdo', 'Noto Sans KR', cursive">동해 독도체</option>
+          <option value="'Poor Story', 'Noto Sans KR', cursive">푸어스토리</option>
+          <option value="'Yeon Sung', 'Noto Sans KR', cursive">연성체</option>
+          <option value="'Stylish', 'Noto Sans KR', sans-serif">스타일리쉬</option>
+          <option value="'Single Day', 'Noto Sans KR', cursive">싱글데이</option>
+          <option value="'Sunflower', 'Noto Sans KR', sans-serif">해바라기체</option>
+          <option value="'Kirang Haerang', 'Noto Sans KR', cursive">키랑해랑체</option>
+          <option value="'Gugi', 'Noto Sans KR', cursive">구기체</option>
+          <option value="'Gamja Flower', 'Noto Sans KR', cursive">감자꽃체</option>
+          <option value="'Hi Melody', 'Noto Sans KR', cursive">하이멜로디</option>
+          <option value="'Jeju Hallasan', 'Noto Sans KR', cursive">제주한라산체</option>
+          <option value="'Jeju Gothic', 'Noto Sans KR', sans-serif">제주고딕체</option>
         </select>
         <select id="sizeSelect" title="글자 크기(pt)">
           <option value="9">9pt</option>
@@ -603,6 +851,15 @@
           <div class="sw" style="background:#DCC6E8" data-hl="#DCC6E8"></div>
         </span>
         <div class="sep"></div>
+        <span class="swatches row-bg-swatches" title="문단 배경(포스트잇)">
+          <div class="sw none" data-rowbg=""></div>
+          <div class="sw" style="background:#F5DE8A" data-rowbg="rgba(245,222,138,0.35)"></div>
+          <div class="sw" style="background:#F2B6A8" data-rowbg="rgba(242,182,168,0.35)"></div>
+          <div class="sw" style="background:#BEDCC4" data-rowbg="rgba(190,220,196,0.35)"></div>
+          <div class="sw" style="background:#BFD6E8" data-rowbg="rgba(191,214,232,0.35)"></div>
+        </span>
+        <button id="dateInsertBtn" title="오늘 날짜/시간 삽입">📅 날짜</button>
+        <div class="sep"></div>
         <button data-cmd="justifyLeft" title="왼쪽 정렬">≡◁</button>
         <button data-cmd="justifyCenter" title="가운데 정렬">≡○</button>
         <button data-cmd="justifyRight" title="오른쪽 정렬">≡▷</button>
@@ -610,6 +867,8 @@
         <button id="linkBtn" title="링크 삽입">🔗</button>
         <button id="imageBtn" title="이미지 삽입 (파일 업로드)">🖼️</button>
         <input type="file" id="imageFileInput" accept="image/*" style="display:none">
+        <button id="fileAttachBtn" title="파일 첨부 (이미지 외 아무 파일)">📎</button>
+        <input type="file" id="fileAttachInput" style="display:none">
         <input type="file" id="backupFileInput" accept="application/json" style="display:none">
         <button id="tableBtn" title="표 삽입">▦</button>
         <button id="dividerBtn" title="구분선 삽입">— —</button>
@@ -625,8 +884,12 @@
 
       <div id="searchBox">
         <input id="searchInput" type="text" placeholder="이 조사 안에서 찾기..." />
+        <span id="searchCount" style="font-size:11.5px;color:var(--ink-faint);min-width:44px;"></span>
         <button id="searchPrevBtn">이전</button>
         <button id="searchNextBtn">다음</button>
+        <span class="sep" style="width:1px;height:16px;background:var(--line);margin:0 4px;"></span>
+        <input id="replaceInput" type="text" placeholder="바꿀 내용..." style="width:140px;" />
+        <button id="replaceAllBtn">모두 바꾸기</button>
         <button id="searchCloseBtn">닫기</button>
       </div>
 
@@ -667,8 +930,147 @@
 
       <div class="footer-bar">
         <span id="wordCount">0자 · 0단어</span>
-        <span>탭 옆 🔗를 누르면 다른 사람과 공유해서 함께 편집할 수 있어요</span>
+        <span>탭 옆 🔗를 누르면 공유 · Ctrl+K로 모든 워크스페이스의 탭을 빠르게 이동할 수 있어요</span>
       </div>
+    </div>
+  </div>
+</div>
+
+<div id="cmdPalette">
+  <div class="cmd-box">
+    <input id="cmdInput" type="text" placeholder="탭 이름으로 검색 (Ctrl+K)..." />
+    <div class="cmd-list" id="cmdList"></div>
+  </div>
+</div>
+
+<div id="settingsPanel">
+  <div class="settings-box">
+    <div class="settings-head">
+      <h2>⚙️ 설정</h2>
+      <button class="settings-x" id="settingsCloseBtn">닫기 ✕</button>
+    </div>
+    <div class="settings-body">
+      <section>
+        <h3>화면</h3>
+        <div class="set-row"><span>다크 모드</span><button id="darkModeBtn">🌙 켜기/끄기</button></div>
+        <div class="set-row"><span>해질녘 자동 다크모드 (19시~7시)</span><label class="switch"><input type="checkbox" id="autoDarkToggle"><span></span></label></div>
+        <div class="set-row"><span>집중 모드 (사이드바·툴바 숨기기)</span><button id="focusModeBtn">🎯 켜기/끄기</button></div>
+        <div class="set-row"><span>읽기 모드 (읽기 전용으로 크게 보기)</span><button id="readerModeBtn">📖 켜기/끄기</button></div>
+        <div class="set-row"><span>사이드바</span><button id="sidebarCollapseBtn">◀ 접기/펼치기</button></div>
+        <div class="set-row"><span>에디터 폭</span>
+          <select id="docWidthSelect"><option value="narrow">좁게</option><option value="normal">보통</option><option value="wide">넓게</option></select>
+        </div>
+        <div class="set-row"><span>줄 간격</span>
+          <select id="lineHeightSelect"><option value="tight">좁게</option><option value="normal">보통</option><option value="relaxed">넓게</option></select>
+        </div>
+        <div class="set-row"><span>기본 글꼴 (새로 쓰는 글)</span>
+          <select id="defaultFontSelect">
+            <option value="">둥근 손글씨</option>
+            <option value="'Gaegu', 'Noto Sans KR', sans-serif">개구쟁이체</option>
+            <option value="'Jua', 'Noto Sans KR', sans-serif">주아체</option>
+            <option value="'Nanum Pen Script', 'Noto Sans KR', cursive">펜글씨</option>
+            <option value="'Gowun Batang', 'Noto Serif KR', serif">고운바탕</option>
+            <option value="'Song Myung', 'Noto Serif KR', serif">명조체</option>
+            <option value="'Nanum Gothic', 'Noto Sans KR', sans-serif">나눔고딕</option>
+            <option value="'Noto Sans KR', sans-serif">노토 산스</option>
+            <option value="'Noto Serif KR', serif">노토 명조</option>
+            <option value="'Nanum Myeongjo', 'Noto Serif KR', serif">나눔명조</option>
+            <option value="'Nanum Brush Script', 'Noto Sans KR', cursive">나눔손글씨 붓</option>
+            <option value="'Nanum Gothic Coding', 'Noto Sans KR', monospace">나눔고딕 코딩</option>
+            <option value="'Do Hyeon', 'Noto Sans KR', sans-serif">도현체</option>
+            <option value="'Black Han Sans', 'Noto Sans KR', sans-serif">검은고딕</option>
+            <option value="'East Sea Dokdo', 'Noto Sans KR', cursive">동해 독도체</option>
+            <option value="'Poor Story', 'Noto Sans KR', cursive">푸어스토리</option>
+            <option value="'Yeon Sung', 'Noto Sans KR', cursive">연성체</option>
+            <option value="'Stylish', 'Noto Sans KR', sans-serif">스타일리쉬</option>
+            <option value="'Single Day', 'Noto Sans KR', cursive">싱글데이</option>
+            <option value="'Sunflower', 'Noto Sans KR', sans-serif">해바라기체</option>
+            <option value="'Kirang Haerang', 'Noto Sans KR', cursive">키랑해랑체</option>
+            <option value="'Gugi', 'Noto Sans KR', cursive">구기체</option>
+            <option value="'Gamja Flower', 'Noto Sans KR', cursive">감자꽃체</option>
+            <option value="'Hi Melody', 'Noto Sans KR', cursive">하이멜로디</option>
+            <option value="'Jeju Hallasan', 'Noto Sans KR', cursive">제주한라산체</option>
+            <option value="'Jeju Gothic', 'Noto Sans KR', sans-serif">제주고딕체</option>
+          </select>
+        </div>
+        <div class="set-row"><span>기본 글자 크기</span>
+          <select id="defaultSizeSelect">
+            <option value="14">14px</option><option value="15">15px</option><option value="16">16px</option>
+            <option value="17">17px</option><option value="18">18px</option><option value="20">20px</option>
+          </select>
+        </div>
+      </section>
+
+      <section>
+        <h3>탭 정리</h3>
+        <div class="set-row"><span>탭 정렬 방식</span>
+          <select id="tabSortSelect"><option value="pinned">고정 우선</option><option value="name">이름순</option><option value="recent">최근 수정순</option></select>
+        </div>
+        <div class="set-row" style="flex-direction:column;align-items:stretch;">
+          <span style="margin-bottom:4px;">워크스페이스 순서 바꾸기</span>
+          <div id="wsReorderList"></div>
+        </div>
+        <div class="set-row" style="flex-direction:column;align-items:stretch;">
+          <span style="margin-bottom:4px;">최근 열어본 탭</span>
+          <div id="recentTabsList"></div>
+        </div>
+        <div class="set-row" style="flex-direction:column;align-items:stretch;">
+          <span style="margin-bottom:4px;">탭 병합 (선택한 탭을 지금 보고 있는 탭에 합치기)</span>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <select id="mergeSourceSelect" style="flex:1;"></select>
+            <button id="mergeTabsBtn">합치기</button>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>생산성</h3>
+        <div class="set-row"><span>휴지통 (삭제한 탭 복원)</span><button id="trashBtn">🗑 열기</button></div>
+        <div class="set-row"><span>스냅샷 (버전 저장/복원)</span><button id="snapshotBtn">📸 열기</button></div>
+        <div class="set-row"><span>태그 모아보기 (#태그)</span><button id="tagsBtn">🏷 열기</button></div>
+        <div class="set-row"><span>즐겨찾기 문단 (⭐로 표시한 줄)</span><button id="starredBtn">⭐ 열기</button></div>
+        <div class="set-row"><span>목차 (제목 모아보기)</span><button id="tocBtn">🧾 열기</button></div>
+        <div class="set-row"><span>할 일 모아보기 (미완료 전체)</span><button id="todosOverviewBtn">📝 열기</button></div>
+        <div class="set-row"><span>전체 통계</span><button id="statsBtn">📊 열기</button></div>
+        <div class="set-row"><span>이 조사의 체크리스트</span>
+          <span style="display:flex;gap:6px;"><button id="checkAllBtn">전체 완료</button><button id="uncheckAllBtn">전체 초기화</button></span>
+        </div>
+        <div class="set-row"><span>이 조사 잠금(비밀번호)</span><button id="lockTabBtn">🔒 잠그기/해제</button></div>
+        <div class="set-row" style="flex-direction:column;align-items:stretch;">
+          <span style="margin-bottom:4px;">하루 글자수 목표</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="number" id="dailyGoalInput" min="0" step="50" placeholder="예: 500" style="width:100px;">
+            <span id="dailyGoalProgress" style="font-size:12px;color:var(--ink-soft);"></span>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3>데이터</h3>
+        <div class="set-row"><span>동기화 (다른 창의 최신 내용)</span><button id="syncBtn">🔄 지금 불러오기</button></div>
+        <div class="set-row"><span>전체 백업 (JSON 내보내기/가져오기)</span><button id="backupBtn">📦 열기</button></div>
+        <div class="set-row"><span>마크다운으로 내보내기</span><button id="exportMdBtn">.md 저장</button></div>
+        <div class="set-row"><span>텍스트로 내보내기</span><button id="exportTxtBtn">.txt 저장</button></div>
+        <div class="set-row"><span>이 조사 전체 복사(클립보드)</span><button id="copyTabBtn">📋 복사</button></div>
+        <div class="set-row"><span>워크스페이스 전체 내보내기</span><button id="exportWsMdBtn">.md로 한번에</button></div>
+        <div class="set-row"><span>워크스페이스 전체 인쇄/PDF</span><button id="printWsBtn">🖨 인쇄하기</button></div>
+        <div class="set-row"><span>이메일로 보내기</span><button id="emailTabBtn">✉️ 보내기</button></div>
+        <div class="set-row"><span>자동저장 속도</span>
+          <select id="autosaveDelaySelect"><option value="300">빠르게</option><option value="600">보통</option><option value="1500">느리게</option></select>
+        </div>
+        <div class="set-row"><span>저장 용량</span><span id="storageSizeLabel">-</span></div>
+        <div class="set-row"><span>마지막 저장 시각</span><span id="lastSavedLabel">-</span></div>
+        <div class="set-row danger-row"><span>전체 데이터 초기화</span><button class="danger-btn" id="resetAllBtn">⚠️ 초기화</button></div>
+      </section>
+
+      <section>
+        <h3>계정</h3>
+        <div class="set-row"><span>표시 이름(별명)</span><button id="nicknameBtn">✎ 바꾸기</button></div>
+        <div class="set-row"><span>다른 이름으로 전환</span><button id="switchAccountBtn">🔀 전환</button></div>
+        <div class="set-row"><span>알림(토스트) 끄기</span><label class="switch"><input type="checkbox" id="muteToastToggle"><span></span></label></div>
+        <div class="set-row"><span>단축키 안내</span><button id="shortcutsBtn">❓ 보기</button></div>
+        <div class="set-row"><span>이 조사를 Claude에게 물어보기</span><button id="askClaudeBtn">🤖 물어보기</button></div>
+      </section>
     </div>
   </div>
 </div>
@@ -690,7 +1092,8 @@
 
   function uid(){ return 'id_' + Math.random().toString(36).slice(2,10) + Date.now().toString(36); }
 
-  function showToast(msg){
+  function showToast(msg, force){
+    if(!force && profile && profile.settings && profile.settings.muteToasts) return;
     const t = $('#toast');
     t.textContent = msg;
     t.classList.add('show');
@@ -784,19 +1187,22 @@
       }
       lastKnownUpdatedAt = profile.updatedAt;
       setSaveStatus('saved');
-    }catch(e){ console.error('저장 실패', e); setSaveStatus('saved'); showToast('저장에 실패했어요'); }
+    }catch(e){ console.error('저장 실패', e); setSaveStatus('saved'); showToast('저장에 실패했어요', true); }
   }
 
   let saveTimer = null;
+  let AUTOSAVE_DELAY = 600;
   function scheduleSave(){
     clearTimeout(saveTimer);
     setSaveStatus('saving');
+    const tabNow = profile ? getActiveTab() : null;
+    if(tabNow) tabNow.updatedAt = Date.now();
     saveTimer = setTimeout(async ()=>{
       saveTimer = null;
       await saveProfile();
       const tab = profile ? getActiveTab() : null;
       if(tab && tab.shared) await saveSharedTab(tab);
-    }, 600);
+    }, AUTOSAVE_DELAY);
   }
 
   function isEditingNow(){
@@ -805,10 +1211,14 @@
   }
 
   function applyRemoteProfile(remote, msg){
-    profile = remote;
-    lastKnownUpdatedAt = remote.updatedAt || 0;
-    if(!profile.tabs.find(t=>t.id===profile.activeTabId)) profile.activeTabId = profile.tabs[0].id;
-    renderTabs(); renderEditor();
+    profile = migrateProfile(remote);
+    lastKnownUpdatedAt = profile.updatedAt || 0;
+    if(!profile.workspaces.find(w=>w.id===profile.activeWorkspaceId)) profile.activeWorkspaceId = profile.workspaces[0].id;
+    const ws = getActiveWorkspace();
+    if(ws && !ws.tabs.find(t=>t.id===ws.activeTabId)) ws.activeTabId = ws.tabs[0].id;
+    applySettings();
+    applyIdentityLabels();
+    if($('#app').classList.contains('active')){ renderTabs(); renderEditor(); }
     if(msg) showToast(msg);
   }
 
@@ -821,7 +1231,7 @@
       const remoteUpdated = remote.updatedAt || 0;
       if(remoteUpdated > lastKnownUpdatedAt) applyRemoteProfile(remote, '최신 내용을 불러왔어요');
       else if(manual) showToast('이미 최신 내용이에요');
-    }catch(e){ if(manual) showToast('동기화에 실패했어요'); }
+    }catch(e){ if(manual) showToast('동기화에 실패했어요', true); }
   }
 
   function attachRealtimeListener(){
@@ -932,13 +1342,15 @@
       showToast(recipientName + '님에게 공유했어요');
     }catch(e){
       console.error(e);
-      showToast('공유에 실패했어요');
+      showToast('공유에 실패했어요', true);
     }
   }
 
   async function processIncomingShare(entry){
     if(!entry || !entry.shareId || !profile) return;
-    if(profile.tabs.find(t => t.shared && t.shared.shareId === entry.shareId)) return; // already added
+    const targetWs = getActiveWorkspace() || profile.workspaces[0];
+    if(!targetWs) return;
+    if(targetWs.tabs.find(t => t.shared && t.shared.shareId === entry.shareId)) return; // already added
     const fresh = await readSharedNode(entry.shareId);
     const stub = {
       id: uid(),
@@ -954,8 +1366,8 @@
       },
       _lastKnownUpdatedAt: (fresh && fresh.updatedAt) || 0
     };
-    profile.tabs.push(stub);
-    renderTabs();
+    targetWs.tabs.push(stub);
+    if($('#app').classList.contains('active')) renderTabs();
     scheduleSave();
     showToast((entry.fromName || '상대방') + '님이 "' + (stub.title || '제목 없는 조사') + '" 노트를 공유했어요 — 함께 편집할 수 있어요');
   }
@@ -1030,9 +1442,55 @@
     };
   }
 
-  function makeDefaultProfile(name){
+  const WS_EMOJIS = ['🗂️','📚','🔬','💡','🧭','🌱','🎯','🧩'];
+
+  function newWorkspace(name){
     const t = newTab('첫 조사');
-    return { name, tabs:[t], activeTabId: t.id };
+    return {
+      id: uid(),
+      name: name || '새 워크스페이스',
+      emoji: WS_EMOJIS[Math.floor(Math.random()*WS_EMOJIS.length)],
+      color: SWATCH_COLORS[Math.floor(Math.random()*SWATCH_COLORS.length)],
+      createdAt: new Date().toISOString().slice(0,10),
+      tabs: [t],
+      activeTabId: t.id,
+      trash: []
+    };
+  }
+
+  function defaultSettings(){
+    return {
+      docWidth: 'normal', lineHeight: 'normal', defaultFont: '', defaultSize: '16',
+      tabSort: 'pinned', autosaveDelay: 600, dailyGoal: 0, muteToasts: false,
+      autoDark: false, sidebarCollapsed: false, nickname: ''
+    };
+  }
+
+  function makeDefaultProfile(name){
+    const w = newWorkspace('기본 워크스페이스');
+    return { name, workspaces:[w], activeWorkspaceId: w.id, settings: defaultSettings(), recentTabs: [] };
+  }
+
+  // migrate profiles saved before the workspace (큰 탭) layer existed
+  function migrateProfile(p){
+    if(!p) return p;
+    if(!Array.isArray(p.workspaces)){
+      const w = newWorkspace('기본 워크스페이스');
+      if(Array.isArray(p.tabs) && p.tabs.length){
+        w.tabs = p.tabs;
+        w.activeTabId = p.activeTabId && p.tabs.find(t=>t.id===p.activeTabId) ? p.activeTabId : p.tabs[0].id;
+      }
+      w.trash = [];
+      delete p.tabs;
+      delete p.activeTabId;
+      p.workspaces = [w];
+      p.activeWorkspaceId = w.id;
+    }
+    p.workspaces.forEach(w=>{ if(!Array.isArray(w.trash)) w.trash = []; });
+    if(!p.settings) p.settings = defaultSettings();
+    else p.settings = Object.assign(defaultSettings(), p.settings);
+    if(!Array.isArray(p.recentTabs)) p.recentTabs = [];
+    return p;
   }
 
   // ---------- setup screen (Firebase config) ----------
@@ -1081,7 +1539,7 @@
     let raw = $('#fbConfigInput').value.trim();
     if(!raw){ showToast('설정 내용을 붙여넣어주세요'); return; }
     const cfg = extractFirebaseConfig(raw);
-    if(!cfg){ showToast('형식을 확인해주세요'); return; }
+    if(!cfg){ showToast('형식을 확인해주세요', true); return; }
     if(!cfg.apiKey || !cfg.projectId){ showToast('apiKey와 projectId가 포함되어 있는지 확인해주세요'); return; }
     localStorage.setItem(FB_CONFIG_KEY, JSON.stringify(cfg));
     localStorage.removeItem(FB_SKIP_KEY);
@@ -1090,7 +1548,7 @@
       showToast('Firebase에 연결됐어요');
       hideSetupScreen();
     } else {
-      showToast('연결에 실패했어요. 설정 내용을 다시 확인해주세요');
+      showToast('연결에 실패했어요. 설정 내용을 다시 확인해주세요', true);
     }
   });
   $('#fbSkipBtn').addEventListener('click', ()=>{
@@ -1108,29 +1566,113 @@
     if(!name){ showToast('이름을 입력해주세요'); return; }
     let p = await loadProfile(name);
     if(!p){ p = makeDefaultProfile(name); p.updatedAt = Date.now(); }
+    p = migrateProfile(p);
     profile = p;
     lastKnownUpdatedAt = profile.updatedAt || 0;
-    $('#loginScreen').style.display = 'none';
-    $('#app').classList.add('active');
     $('#userNameLabel').textContent = profile.name;
     $('#avatarInitial').textContent = profile.name.slice(0,1);
-    if(!profile.tabs.find(t=>t.id===profile.activeTabId)) profile.activeTabId = profile.tabs[0].id;
+    $('#wsUserLabel').textContent = profile.name + '님';
+    if(!profile.workspaces.find(w=>w.id===profile.activeWorkspaceId)) profile.activeWorkspaceId = profile.workspaces[0].id;
     try{ localStorage.setItem(LAST_NAME_KEY, profile.name); }catch(e){}
+    applySettings();
+    applyIdentityLabels();
+    evaluateAutoDark();
     startSyncPolling();
-    await switchToTab(profile.activeTabId);
+    showWorkspaceScreen();
   }
   $('#loginBtn').addEventListener('click', ()=>doLogin());
   $('#nameInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doLogin(); });
 
-  $('#logoutBtn').addEventListener('click', ()=>{
+  function fullLogout(){
     saveProfile();
     profile = null;
     $('#app').classList.remove('active');
+    $('#workspaceScreen').classList.remove('active');
     $('#loginScreen').style.display = 'flex';
     $('#nameInput').value = '';
     try{ localStorage.removeItem(LAST_NAME_KEY); }catch(e){}
     stopSyncPolling();
-  });
+  }
+  $('#logoutBtn').addEventListener('click', fullLogout);
+  $('#wsLogoutBtn').addEventListener('click', fullLogout);
+
+  // ---------- workspace (큰 탭) screen ----------
+  function getActiveWorkspace(){ return profile.workspaces.find(w => w.id === profile.activeWorkspaceId); }
+
+  function renderWorkspaceGrid(){
+    const grid = $('#wsGrid');
+    grid.innerHTML = '';
+    profile.workspaces.forEach(ws=>{
+      const totalChars = (ws.tabs||[]).reduce((sum,t)=>{
+        const txt = (t.blocks||[]).map(b=>(b.html||'').replace(/<[^>]+>/g,'')).join('');
+        return sum + txt.length;
+      }, 0);
+      const card = document.createElement('div');
+      card.className = 'ws-card';
+      card.innerHTML = `<span class="ws-dot" style="background:${ws.color}"></span>
+        <span class="ws-edit" title="이름 바꾸기">✎</span>
+        <span class="ws-del" title="워크스페이스 삭제">✕</span>
+        <div class="ws-emoji">${ws.emoji || '🗂️'}</div>
+        <div class="ws-name">${escapeHtml(ws.name || '이름 없음')}</div>
+        <div class="ws-sub2">탭 ${ (ws.tabs||[]).length }개 · 글자 ${totalChars}자</div>`;
+      card.addEventListener('click', (e)=>{
+        if(e.target.closest('.ws-edit, .ws-del')) return;
+        openWorkspace(ws.id);
+      });
+      $('.ws-edit', card).addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const name = prompt('워크스페이스 이름을 입력해주세요', ws.name || '');
+        if(name === null) return;
+        ws.name = name.trim() || ws.name;
+        const emoji = prompt('아이콘(이모지)을 입력해주세요', ws.emoji || '');
+        if(emoji !== null) ws.emoji = emoji.trim().slice(0,2) || ws.emoji;
+        renderWorkspaceGrid(); scheduleSave();
+      });
+      $('.ws-del', card).addEventListener('click', (e)=>{
+        e.stopPropagation();
+        if(profile.workspaces.length <= 1){ showToast('마지막 워크스페이스는 남겨둘게요'); return; }
+        if(!confirm('"' + (ws.name||'이름 없음') + '" 워크스페이스와 그 안의 모든 탭을 삭제할까요?')) return;
+        profile.workspaces = profile.workspaces.filter(w=>w.id!==ws.id);
+        if(profile.activeWorkspaceId === ws.id) profile.activeWorkspaceId = profile.workspaces[0].id;
+        renderWorkspaceGrid(); scheduleSave();
+      });
+      grid.appendChild(card);
+    });
+    const addCard = document.createElement('div');
+    addCard.className = 'ws-card add-card';
+    addCard.innerHTML = '<div style="font-size:26px;">＋</div><div style="font-size:13px;">새 워크스페이스</div>';
+    addCard.addEventListener('click', ()=>{
+      const name = prompt('새 워크스페이스(큰 주제) 이름을 입력해주세요', '');
+      if(name === null) return;
+      const w = newWorkspace(name.trim() || '새 워크스페이스');
+      profile.workspaces.push(w);
+      renderWorkspaceGrid(); scheduleSave();
+      showToast('워크스페이스를 만들었어요 — 눌러서 들어가보세요');
+    });
+    grid.appendChild(addCard);
+  }
+
+  function showWorkspaceScreen(){
+    detachActiveSharedListener();
+    $('#loginScreen').style.display = 'none';
+    $('#app').classList.remove('active');
+    $('#workspaceScreen').classList.add('active');
+    $('#wsUserLabel').textContent = profile.name + '님';
+    renderWorkspaceGrid();
+  }
+
+  async function openWorkspace(wsId){
+    profile.activeWorkspaceId = wsId;
+    const ws = getActiveWorkspace();
+    if(!ws) return;
+    if(!ws.tabs.find(t=>t.id===ws.activeTabId)) ws.activeTabId = ws.tabs[0].id;
+    $('#workspaceScreen').classList.remove('active');
+    $('#app').classList.add('active');
+    scheduleSave();
+    await switchToTab(ws.activeTabId);
+  }
+
+  $('#wsSwitchBtn').addEventListener('click', ()=>{ saveProfile(); showWorkspaceScreen(); });
 
   $('#syncBtn').addEventListener('click', ()=> syncFromStorage(true));
 
@@ -1173,32 +1715,58 @@
   }
 
   // ---------- tabs ----------
-  function getActiveTab(){ return profile.tabs.find(t => t.id === profile.activeTabId); }
+  function getActiveTab(){
+    const ws = getActiveWorkspace();
+    return ws ? ws.tabs.find(t => t.id === ws.activeTabId) : null;
+  }
 
   function escapeHtml(str){ const d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
 
+  function tabTodoProgress(tab){
+    let total=0, done=0;
+    (tab.blocks||[]).forEach(b=>{ if(b.type==='todo'){ total++; if(b.checked) done++; } });
+    return { total, done };
+  }
+
   function renderTabs(){
+    const ws = getActiveWorkspace();
+    if(!ws) return;
     const rail = $('#tabRail');
     $$('.tab-item', rail).forEach(el => el.remove());
     const addBtn = $('#addTabBtn');
-    const sorted = profile.tabs.slice().sort((a,b)=>{
+    $('.rail-label', rail).textContent = (ws.emoji||'🗂️') + ' ' + (ws.name || '워크스페이스') + ' 안의 조사';
+    const pnInput = $('#pinnedNoteInput');
+    if(document.activeElement !== pnInput) pnInput.value = ws.pinnedNote || '';
+    $('.pinned-note-wrap').classList.toggle('has-note', !!(ws.pinnedNote && ws.pinnedNote.trim()));
+    const sortMode = (profile.settings && profile.settings.tabSort) || 'pinned';
+    const sorted = ws.tabs.slice().sort((a,b)=>{
       const pa = a.pinned ? 1 : 0, pb = b.pinned ? 1 : 0;
-      return pb - pa;
+      if(pa !== pb) return pb - pa;
+      if(sortMode === 'name') return (a.title||a.name||'').localeCompare(b.title||b.name||'', 'ko');
+      if(sortMode === 'recent') return (b.updatedAt||0) - (a.updatedAt||0);
+      return 0;
     });
     sorted.forEach(tab=>{
       const item = document.createElement('div');
-      item.className = 'tab-item' + (tab.id === profile.activeTabId ? ' active' : '') + (tab.pinned ? ' pinned' : '');
+      item.className = 'tab-item' + (tab.id === ws.activeTabId ? ' active' : '') + (tab.pinned ? ' pinned' : '');
       const sharedBadge = tab.shared ? `<span class="shared-badge" title="${escapeHtml((tab.shared.collaborators||[]).join(', '))}님과 함께 편집 중">👥</span>` : '';
+      const lockBadge = (tab.lock && tab.lock.enabled) ? `<span class="shared-badge" title="비밀번호로 잠긴 조사">🔒</span>` : '';
       const emojiSpan = tab.emoji ? `<span class="tab-emoji">${tab.emoji}</span>` : '';
+      const prog = tabTodoProgress(tab);
+      const progressHtml = prog.total ? `<div class="tab-progress-wrap" title="할 일 ${prog.done}/${prog.total}"><div class="bar" style="width:${Math.round(prog.done/prog.total*100)}%"></div></div>` : '';
       item.innerHTML = `<span class="swatch" style="background:${tab.color}"></span>
         ${emojiSpan}
-        <span class="label">${escapeHtml(tab.title || tab.name || '제목 없는 조사')}</span>
+        <span class="tab-item-col">
+          <span class="label">${escapeHtml(tab.title || tab.name || '제목 없는 조사')}</span>
+          ${progressHtml}
+        </span>
         ${sharedBadge}
+        ${lockBadge}
         <span class="emoji-tab" title="아이콘 지정">🙂</span>
         <span class="pin-tab" title="${tab.pinned ? '고정 해제' : '위쪽에 고정'}">📌</span>
         <span class="dup-tab" title="탭 복제">⧉</span>
         <span class="share-tab" title="다른 사람과 공유">🔗</span>
-        <span class="del-tab" title="삭제">✕</span>`;
+        <span class="del-tab" title="삭제 (휴지통으로 이동)">✕</span>`;
       item.addEventListener('click', (e)=>{
         if(e.target.closest('.del-tab, .share-tab, .pin-tab, .dup-tab, .emoji-tab')) return;
         switchToTab(tab.id);
@@ -1220,8 +1788,8 @@
         copy.shared = null; // duplicates start as private copies, not linked to the shared original
         copy.blocks = copy.blocks.map(b => ({ ...b, id: uid() }));
         copy.title = (tab.title || tab.name || '제목 없는 조사') + ' 사본';
-        const idx = profile.tabs.indexOf(tab);
-        profile.tabs.splice(idx+1, 0, copy);
+        const idx = ws.tabs.indexOf(tab);
+        ws.tabs.splice(idx+1, 0, copy);
         renderTabs(); scheduleSave();
         showToast('탭을 복제했어요');
       });
@@ -1234,18 +1802,33 @@
       });
       $('.del-tab', item).addEventListener('click', (e)=>{
         e.stopPropagation();
-        if(profile.tabs.length <= 1){ showToast('마지막 탭은 남겨둘게요'); return; }
-        if(!confirm('이 조사 탭을 삭제할까요?')) return;
+        if(ws.tabs.length <= 1){ showToast('마지막 탭은 남겨둘게요'); return; }
+        if(!confirm('이 조사 탭을 휴지통으로 옮길까요? (휴지통에서 다시 복원할 수 있어요)')) return;
         detachActiveSharedListener();
-        profile.tabs = profile.tabs.filter(t=>t.id !== tab.id);
-        if(profile.activeTabId === tab.id) profile.activeTabId = profile.tabs[0].id;
+        ws.tabs = ws.tabs.filter(t=>t.id !== tab.id);
+        if(!Array.isArray(ws.trash)) ws.trash = [];
+        ws.trash.unshift({ tab: tab, deletedAt: Date.now() });
+        ws.trash = ws.trash.slice(0,20);
+        if(ws.activeTabId === tab.id) ws.activeTabId = ws.tabs[0].id;
         renderTabs(); renderEditor(); scheduleSave();
+        showToast('휴지통으로 옮겼어요 — 🗑 휴지통에서 되돌릴 수 있어요');
       });
       rail.insertBefore(item, addBtn);
     });
   }
 
   // ---------- search across all tabs ----------
+  $('#pinnedNoteToggle').addEventListener('click', ()=>{
+    $('.pinned-note-wrap').classList.toggle('expanded');
+  });
+  $('#pinnedNoteInput').addEventListener('input', (e)=>{
+    const ws = getActiveWorkspace();
+    if(!ws) return;
+    ws.pinnedNote = e.target.value;
+    $('.pinned-note-wrap').classList.toggle('has-note', !!e.target.value.trim());
+    scheduleSave();
+  });
+
   $('#tabSearchInput').addEventListener('input', (e)=>{
     const q = e.target.value.trim().toLowerCase();
     const items = $$('.tab-item', $('#tabRail'));
@@ -1253,7 +1836,8 @@
       items.forEach(el=> el.classList.remove('search-hidden','search-match'));
       return;
     }
-    const sorted = profile.tabs.slice().sort((a,b)=> (b.pinned?1:0) - (a.pinned?1:0));
+    const ws = getActiveWorkspace();
+    const sorted = ws.tabs.slice().sort((a,b)=> (b.pinned?1:0) - (a.pinned?1:0));
     items.forEach((el, i)=>{
       const tab = sorted[i];
       if(!tab){ return; }
@@ -1266,9 +1850,22 @@
 
   async function switchToTab(tabId){
     detachActiveSharedListener();
-    profile.activeTabId = tabId;
+    if(searchMarks.length) clearSearchMarks();
+    const ws = getActiveWorkspace();
+    if(!ws) return;
+    const targetTab = ws.tabs.find(t => t.id === tabId);
+    if(targetTab && targetTab.lock && targetTab.lock.enabled && !unlockedTabIds.has(targetTab.id)){
+      const pass = prompt('이 조사는 잠겨있어요. 비밀번호를 입력해주세요');
+      if(pass === null) return;
+      if(simpleHash(pass) !== targetTab.lock.pass){ showToast('비밀번호가 틀렸어요', true); return; }
+      unlockedTabIds.add(targetTab.id);
+    }
+    ws.activeTabId = tabId;
     renderTabs();
     const tab = getActiveTab();
+    if(tab && ws) trackRecentTab(ws.id, tab.id, tab.title || tab.name);
+    if(tab) maybeAutoSnapshot(tab);
+    if(document.body.classList.contains('reader-mode')) setReaderMode(false);
     if(tab && tab.shared){
       renderEditor(); // show cached content immediately while we refresh
       try{
@@ -1291,9 +1888,10 @@
 
   $('#addTabBtn').addEventListener('click', ()=>{
     detachActiveSharedListener();
+    const ws = getActiveWorkspace();
     const t = newTab();
-    profile.tabs.push(t);
-    profile.activeTabId = t.id;
+    ws.tabs.push(t);
+    ws.activeTabId = t.id;
     renderTabs(); renderEditor(); scheduleSave();
     setTimeout(()=>$('#tabTitleInput').focus(), 50);
   });
@@ -1314,7 +1912,9 @@
     const chars = text.length;
     const words = text.length ? text.split(' ').filter(Boolean).length : 0;
     $('#wordCount').textContent = `${chars}자 · ${words}단어`;
-    $('#tabMeta').textContent = tab.createdAt ? `${tab.createdAt}에 시작한 조사` : '';
+    const readMin = chars ? Math.max(1, Math.round(chars / 500)) : 0;
+    const readLabel = readMin ? ` · 약 ${readMin}분 분량` : '';
+    $('#tabMeta').textContent = (tab.createdAt ? `${tab.createdAt}에 시작한 조사` : '') + readLabel;
   }
 
   // ---------- editor rendering ----------
@@ -1355,6 +1955,7 @@
       row.dataset.id = block.id;
       row.dataset.type = block.type;
       row.style.marginLeft = (block.level * 26) + 'px';
+      if(block.bg) row.style.background = block.bg;
 
       const gutter = document.createElement('div');
       gutter.className = 'gutter';
@@ -1363,6 +1964,40 @@
       toggle.textContent = '▾';
       toggle.addEventListener('click', ()=>{ block.collapsed = !block.collapsed; renderEditor(); scheduleSave(); });
       gutter.appendChild(toggle);
+      const dupIcon = document.createElement('div');
+      dupIcon.className = 'dup-row';
+      dupIcon.textContent = '⧉';
+      dupIcon.title = '이 줄 복제';
+      dupIcon.addEventListener('click', ()=>{
+        const tab = getActiveTab();
+        const i = tab.blocks.findIndex(b=>b.id===block.id);
+        const copy = { ...block, id: uid() };
+        tab.blocks.splice(i+1, 0, copy);
+        renderEditor(); scheduleSave();
+        showToast('줄을 복제했어요');
+      });
+      gutter.appendChild(dupIcon);
+      const starIcon = document.createElement('div');
+      starIcon.className = 'star-row' + (block.starred ? ' active' : '');
+      starIcon.textContent = block.starred ? '⭐' : '☆';
+      starIcon.title = block.starred ? '즐겨찾기 해제' : '이 줄 즐겨찾기';
+      starIcon.addEventListener('click', ()=>{
+        block.starred = !block.starred;
+        renderEditor(); scheduleSave();
+      });
+      gutter.appendChild(starIcon);
+      const moveUpIcon = document.createElement('div');
+      moveUpIcon.className = 'move-row';
+      moveUpIcon.textContent = '▲';
+      moveUpIcon.title = '이 줄 위로 이동';
+      moveUpIcon.addEventListener('click', ()=>{ moveBlock(block.id, -1); });
+      gutter.appendChild(moveUpIcon);
+      const moveDownIcon = document.createElement('div');
+      moveDownIcon.className = 'move-row';
+      moveDownIcon.textContent = '▼';
+      moveDownIcon.title = '이 줄 아래로 이동';
+      moveDownIcon.addEventListener('click', ()=>{ moveBlock(block.id, 1); });
+      gutter.appendChild(moveDownIcon);
 
       if(block.type === 'bullet'){
         const marker = document.createElement('div');
@@ -1380,6 +2015,20 @@
         cb.addEventListener('change', ()=>{ block.checked = cb.checked; renderEditor(); scheduleSave(); });
         marker.appendChild(cb);
         gutter.appendChild(marker);
+        const dueIcon = document.createElement('div');
+        dueIcon.className = 'due-row' + (block.due ? ' active' : '');
+        dueIcon.textContent = '📅';
+        dueIcon.title = block.due ? ('마감일: ' + block.due + ' (클릭해서 변경/삭제)') : '마감일 설정';
+        dueIcon.addEventListener('click', ()=>{
+          const input = prompt('마감일을 입력해주세요 (YYYY-MM-DD, 비우면 삭제)', block.due || '');
+          if(input === null) return;
+          const val = input.trim();
+          if(!val){ block.due = null; }
+          else if(/^\d{4}-\d{2}-\d{2}$/.test(val)){ block.due = val; }
+          else { showToast('날짜 형식이 올바르지 않아요 (YYYY-MM-DD)'); return; }
+          renderEditor(); scheduleSave();
+        });
+        gutter.appendChild(dueIcon);
       }
       // plain text / heading / quote / code blocks get no marker — clean blank-page look
 
@@ -1392,6 +2041,7 @@
 
       content.addEventListener('input', ()=>{
         content.dataset.softEnter = '';
+        autoReplaceArrowAtCaret(content);
         block.html = content.innerHTML;
         maybeAutoTransform(block, content);
         updateWordCount();
@@ -1404,11 +2054,21 @@
       content.addEventListener('paste', (e)=> handlePaste(e, block, content));
       content.addEventListener('click', (e)=>{
         const a = e.target.closest('a');
+        if(a && a.classList.contains('file-attach')) return; // let the native download happen
         if(a){ e.preventDefault(); window.open(a.href, '_blank'); }
       });
 
       row.appendChild(gutter);
       row.appendChild(content);
+
+      if(block.type === 'todo' && block.due){
+        const todayStr = new Date().toISOString().slice(0,10);
+        const cls = block.due < todayStr ? 'due-overdue' : (block.due === todayStr ? 'due-today' : 'due-future');
+        const badge = document.createElement('span');
+        badge.className = 'due-badge ' + cls;
+        badge.textContent = block.due;
+        row.appendChild(badge);
+      }
 
       if(block.collapsed && hasChildren){
         let count = 0;
@@ -1433,6 +2093,588 @@
       case 'todo': return '할 일을 적어주세요';
       default: return '내용을 적어보세요...';
     }
+  }
+
+  // ---------- settings: apply persisted preferences to the UI ----------
+  function applySettings(){
+    if(!profile) return;
+    const s = profile.settings || (profile.settings = defaultSettings());
+    document.body.classList.toggle('doc-narrow', s.docWidth === 'narrow');
+    document.body.classList.toggle('doc-wide', s.docWidth === 'wide');
+    document.body.classList.toggle('line-tight', s.lineHeight === 'tight');
+    document.body.classList.toggle('line-relaxed', s.lineHeight === 'relaxed');
+    document.body.classList.toggle('sidebar-collapsed', !!s.sidebarCollapsed);
+    document.documentElement.style.setProperty('--default-content-font', s.defaultFont || "'Gowun Dodum', sans-serif");
+    document.documentElement.style.setProperty('--default-content-size', (s.defaultSize || '16') + 'px');
+    AUTOSAVE_DELAY = Number(s.autosaveDelay) || 600;
+  }
+
+  function populateSettingsPanel(){
+    if(!profile) return;
+    const s = profile.settings;
+    $('#autoDarkToggle').checked = !!s.autoDark;
+    $('#docWidthSelect').value = s.docWidth || 'normal';
+    $('#lineHeightSelect').value = s.lineHeight || 'normal';
+    $('#defaultFontSelect').value = s.defaultFont || '';
+    $('#defaultSizeSelect').value = s.defaultSize || '16';
+    $('#tabSortSelect').value = s.tabSort || 'pinned';
+    $('#dailyGoalInput').value = s.dailyGoal || '';
+    $('#autosaveDelaySelect').value = String(s.autosaveDelay || 600);
+    $('#muteToastToggle').checked = !!s.muteToasts;
+    renderWsReorderList();
+    renderRecentTabsList();
+    updateDailyGoalProgress();
+    updateStorageAndSavedLabels();
+    populateMergeSourceSelect();
+    updateLockBtnLabel();
+  }
+
+  function openSettingsPanel(){
+    if(!profile) return;
+    populateSettingsPanel();
+    $('#settingsPanel').classList.add('active');
+  }
+  function closeSettingsPanel(){ $('#settingsPanel').classList.remove('active'); }
+  $('#settingsBtn').addEventListener('click', openSettingsPanel);
+  $('#settingsCloseBtn').addEventListener('click', closeSettingsPanel);
+  $('#settingsPanel').addEventListener('mousedown', (e)=>{ if(e.target.id === 'settingsPanel') closeSettingsPanel(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && $('#settingsPanel').classList.contains('active')) closeSettingsPanel(); });
+
+  $('#docWidthSelect').addEventListener('change', (e)=>{ profile.settings.docWidth = e.target.value; applySettings(); scheduleSave(); });
+  $('#lineHeightSelect').addEventListener('change', (e)=>{ profile.settings.lineHeight = e.target.value; applySettings(); scheduleSave(); });
+  $('#defaultFontSelect').addEventListener('change', (e)=>{ profile.settings.defaultFont = e.target.value; applySettings(); scheduleSave(); });
+  $('#defaultSizeSelect').addEventListener('change', (e)=>{ profile.settings.defaultSize = e.target.value; applySettings(); scheduleSave(); });
+  $('#tabSortSelect').addEventListener('change', (e)=>{ profile.settings.tabSort = e.target.value; renderTabs(); scheduleSave(); });
+  $('#autosaveDelaySelect').addEventListener('change', (e)=>{ profile.settings.autosaveDelay = Number(e.target.value); AUTOSAVE_DELAY = profile.settings.autosaveDelay; scheduleSave(); });
+  $('#muteToastToggle').addEventListener('change', (e)=>{ profile.settings.muteToasts = e.target.checked; scheduleSave(); });
+  $('#dailyGoalInput').addEventListener('change', (e)=>{ profile.settings.dailyGoal = Number(e.target.value)||0; updateDailyGoalProgress(); scheduleSave(); });
+
+  $('#sidebarCollapseBtn').addEventListener('click', ()=>{
+    profile.settings.sidebarCollapsed = !profile.settings.sidebarCollapsed;
+    applySettings(); scheduleSave();
+  });
+
+  // ---------- 🎯 자동 다크모드 (해질녘~새벽) ----------
+  $('#autoDarkToggle').addEventListener('change', (e)=>{
+    profile.settings.autoDark = e.target.checked;
+    scheduleSave();
+    evaluateAutoDark();
+  });
+  function evaluateAutoDark(){
+    if(!profile || !profile.settings || !profile.settings.autoDark) return;
+    const h = new Date().getHours();
+    const shouldBeDark = (h >= 19 || h < 7);
+    applyDarkMode(shouldBeDark);
+  }
+  setInterval(evaluateAutoDark, 60000);
+
+  // ---------- 📖 읽기 모드 ----------
+  function setReaderMode(on){
+    document.body.classList.toggle('reader-mode', on);
+    $$('.content').forEach(el=>{ el.contentEditable = on ? 'false' : 'true'; });
+    $('#readerModeBtn').textContent = on ? '📖 편집으로 돌아가기' : '📖 켜기/끄기';
+  }
+  $('#readerModeBtn').addEventListener('click', ()=>{
+    setReaderMode(!document.body.classList.contains('reader-mode'));
+  });
+
+  // ---------- 워크스페이스 순서 바꾸기 ----------
+  function renderWsReorderList(){
+    const box = $('#wsReorderList');
+    box.innerHTML = '';
+    profile.workspaces.forEach((ws, i)=>{
+      const row = document.createElement('div');
+      row.className = 'wsr-item';
+      row.innerHTML = `<span class="wsr-name">${ws.emoji||'🗂️'} ${escapeHtml(ws.name||'이름 없음')}</span>
+        <button type="button" data-up="${i}" ${i===0?'disabled':''}>▲</button>
+        <button type="button" data-down="${i}" ${i===profile.workspaces.length-1?'disabled':''}>▼</button>`;
+      box.appendChild(row);
+    });
+    $$('[data-up]', box).forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = Number(btn.dataset.up);
+        if(i<=0) return;
+        const arr = profile.workspaces;
+        [arr[i-1], arr[i]] = [arr[i], arr[i-1]];
+        renderWsReorderList(); scheduleSave();
+      });
+    });
+    $$('[data-down]', box).forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = Number(btn.dataset.down);
+        const arr = profile.workspaces;
+        if(i>=arr.length-1) return;
+        [arr[i+1], arr[i]] = [arr[i], arr[i+1]];
+        renderWsReorderList(); scheduleSave();
+      });
+    });
+  }
+
+  // ---------- 최근 열어본 탭 ----------
+  function trackRecentTab(wsId, tabId, title){
+    if(!profile) return;
+    if(!Array.isArray(profile.recentTabs)) profile.recentTabs = [];
+    profile.recentTabs = profile.recentTabs.filter(r => r.tabId !== tabId);
+    profile.recentTabs.unshift({ wsId, tabId, title: title || '제목 없는 조사', ts: Date.now() });
+    profile.recentTabs = profile.recentTabs.slice(0,8);
+  }
+  function renderRecentTabsList(){
+    const box = $('#recentTabsList');
+    const list = profile.recentTabs || [];
+    if(!list.length){ box.innerHTML = '<div class="sp-empty" style="padding:4px 0;">아직 없어요</div>'; return; }
+    box.innerHTML = list.map((r,i)=>`<div class="rt-item"><span class="rt-name" data-jump="${i}">${escapeHtml(r.title)}</span></div>`).join('');
+    $$('[data-jump]', box).forEach(el=>{
+      el.addEventListener('click', async ()=>{
+        const r = list[Number(el.dataset.jump)];
+        if(!r) return;
+        const ws = profile.workspaces.find(w=>w.id===r.wsId);
+        if(!ws || !ws.tabs.find(t=>t.id===r.tabId)) { showToast('탭을 찾을 수 없어요 (삭제되었을 수 있어요)'); return; }
+        closeSettingsPanel();
+        if(profile.activeWorkspaceId !== r.wsId){
+          profile.activeWorkspaceId = r.wsId;
+          $('#workspaceScreen').classList.remove('active');
+          $('#app').classList.add('active');
+        }
+        await switchToTab(r.tabId);
+      });
+    });
+  }
+
+  // ---------- 하루 글자수 목표 ----------
+  function totalCharsAcrossProfile(){
+    let sum = 0;
+    profile.workspaces.forEach(ws => ws.tabs.forEach(t=>{
+      sum += (t.blocks||[]).map(b=>(b.html||'').replace(/<[^>]+>/g,'')).join('').length;
+    }));
+    return sum;
+  }
+  function updateDailyGoalProgress(){
+    const el = $('#dailyGoalProgress');
+    if(!profile || !profile.settings) return;
+    const goal = profile.settings.dailyGoal || 0;
+    const today = new Date().toISOString().slice(0,10);
+    if(!profile.settings._dailyBaseline || profile.settings._dailyBaseline.date !== today){
+      profile.settings._dailyBaseline = { date: today, chars: totalCharsAcrossProfile() };
+    }
+    const written = Math.max(0, totalCharsAcrossProfile() - profile.settings._dailyBaseline.chars);
+    if(!goal){ el.textContent = '목표를 입력해보세요'; return; }
+    el.textContent = `오늘 ${written} / ${goal}자 (${Math.min(100, Math.round(written/goal*100))}%)`;
+  }
+
+  // ---------- 마크다운 / 텍스트로 내보내기 ----------
+  function blockToMarkdownLine(block, tab, idx){
+    const text = (block.html||'').replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'').trim();
+    const indent = '  '.repeat(block.level||0);
+    switch(block.type){
+      case 'h1': return indent + '# ' + text;
+      case 'h2': return indent + '## ' + text;
+      case 'h3': return indent + '### ' + text;
+      case 'quote': return indent + '> ' + text;
+      case 'code': return indent + '```\n' + text + '\n```';
+      case 'bullet': return indent + '- ' + text;
+      case 'ordered': return indent + computeOrderedIndex(tab.blocks, idx) + '. ' + text;
+      case 'todo': return indent + '- [' + (block.checked?'x':' ') + '] ' + text;
+      default: return indent + text;
+    }
+  }
+  function downloadTextFile(filename, content, mime){
+    const blob = new Blob([content], { type: mime || 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+  }
+  $('#exportMdBtn').addEventListener('click', ()=>{
+    const tab = getActiveTab();
+    if(!tab){ showToast('내보낼 조사가 없어요'); return; }
+    const lines = ['# ' + (tab.title || tab.name || '제목 없음'), ''];
+    tab.blocks.forEach((b,i)=> lines.push(blockToMarkdownLine(b, tab, i)));
+    downloadTextFile((tab.title||tab.name||'note') + '.md', lines.join('\n'), 'text/markdown');
+    showToast('마크다운 파일을 내려받았어요');
+  });
+  $('#exportTxtBtn').addEventListener('click', ()=>{
+    const tab = getActiveTab();
+    if(!tab){ showToast('내보낼 조사가 없어요'); return; }
+    const lines = [(tab.title || tab.name || '제목 없음'), ''];
+    tab.blocks.forEach(b=> lines.push((b.html||'').replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'').trim()));
+    downloadTextFile((tab.title||tab.name||'note') + '.txt', lines.join('\n'), 'text/plain');
+    showToast('텍스트 파일을 내려받았어요');
+  });
+
+  // ---------- 📋 이 조사 전체를 클립보드로 복사 ----------
+  $('#copyTabBtn').addEventListener('click', async ()=>{
+    const tab = getActiveTab();
+    if(!tab){ showToast('복사할 조사가 없어요'); return; }
+    const lines = [(tab.title || tab.name || '제목 없음'), ''];
+    tab.blocks.forEach(b=> lines.push((b.html||'').replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'').trim()));
+    try{
+      await navigator.clipboard.writeText(lines.join('\n'));
+      showToast('클립보드에 복사했어요');
+    }catch(e){
+      showToast('복사에 실패했어요 — 브라우저 권한을 확인해주세요', true);
+    }
+  });
+
+  // ---------- 워크스페이스 전체를 마크다운 하나로 내보내기 ----------
+  $('#exportWsMdBtn').addEventListener('click', ()=>{
+    const ws = getActiveWorkspace();
+    if(!ws || !ws.tabs.length){ showToast('내보낼 탭이 없어요'); return; }
+    const lines = ['# ' + (ws.name || '워크스페이스'), ''];
+    ws.tabs.forEach(tab=>{
+      lines.push('## ' + (tab.title || tab.name || '제목 없음'), '');
+      tab.blocks.forEach((b,i)=> lines.push(blockToMarkdownLine(b, tab, i)));
+      lines.push('', '---', '');
+    });
+    downloadTextFile((ws.name||'workspace') + '.md', lines.join('\n'), 'text/markdown');
+    showToast('워크스페이스 전체를 마크다운으로 내려받았어요');
+  });
+
+  // ---------- ✉️ 이메일로 보내기 ----------
+  $('#emailTabBtn').addEventListener('click', ()=>{
+    const tab = getActiveTab();
+    if(!tab){ showToast('보낼 조사가 없어요'); return; }
+    const lines = [];
+    tab.blocks.forEach(b=> lines.push((b.html||'').replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]+>/g,'').trim()));
+    let body = lines.join('\n');
+    if(body.length > 1800) body = body.slice(0, 1800) + '\n\n... (내용이 길어 일부만 담겼어요)';
+    const subject = encodeURIComponent(tab.title || tab.name || '생각 정리 노트');
+    window.location.href = 'mailto:?subject=' + subject + '&body=' + encodeURIComponent(body);
+    showToast('메일 앱으로 연결할게요');
+  });
+
+  // ---------- 🖨 워크스페이스 전체 인쇄/PDF ----------
+  function sanitizeBlockHtmlForExport(html){
+    const div = document.createElement('div');
+    div.innerHTML = html || '';
+    div.querySelectorAll('.img-toolbar, .img-resize-handle').forEach(el => el.remove());
+    div.querySelectorAll('a').forEach(a => a.replaceWith(document.createTextNode(a.textContent)));
+    return div.innerHTML;
+  }
+  function buildStaticOutlineHtml(blocks){
+    let html = '';
+    blocks.forEach((block, idx)=>{
+      const marginLeft = (block.level||0) * 26;
+      let markerHtml = '';
+      if(block.type === 'bullet') markerHtml = '<div class="marker">•</div>';
+      else if(block.type === 'ordered') markerHtml = '<div class="marker">' + computeOrderedIndex(blocks, idx) + '.</div>';
+      else if(block.type === 'todo') markerHtml = '<div class="marker">' + (block.checked ? '☑' : '☐') + '</div>';
+      const bg = block.bg ? `background:${block.bg};` : '';
+      html += `<div class="row" data-type="${block.type}"${block.checked?' data-checked="1"':''} style="margin-left:${marginLeft}px;${bg}">`
+        + `<div class="gutter">${markerHtml}</div>`
+        + `<div class="content">${sanitizeBlockHtmlForExport(block.html||'')}</div>`
+        + `</div>`;
+    });
+    return html;
+  }
+  $('#printWsBtn').addEventListener('click', ()=>{
+    const ws = getActiveWorkspace();
+    if(!ws || !ws.tabs.length){ showToast('인쇄할 탭이 없어요'); return; }
+    printWasDark = document.body.classList.contains('dark');
+    if(printWasDark) document.body.classList.remove('dark');
+    let html = '<div class="print-doc-title">' + escapeHtml(ws.name || '워크스페이스') + '</div>';
+    ws.tabs.forEach((tab, i)=>{
+      html += '<div class="print-doc-title" style="font-size:20px;margin-top:0;' + (i ? 'break-before:page;page-break-before:always;' : '') + '">'
+        + escapeHtml(tab.title || tab.name || '제목 없음') + '</div>';
+      html += '<div class="outline">' + buildStaticOutlineHtml(tab.blocks) + '</div>';
+    });
+    $('#printArea').innerHTML = html;
+    originalDocTitle = document.title;
+    document.title = ws.name || '생각 정리 노트';
+    showToast('워크스페이스 전체를 인쇄해요');
+    setTimeout(()=> window.print(), 400);
+  });
+
+  // ---------- 저장 용량 / 마지막 저장 시각 ----------
+  function updateStorageAndSavedLabels(){
+    try{
+      const bytes = new Blob([JSON.stringify(profile)]).size;
+      $('#storageSizeLabel').textContent = (bytes/1024).toFixed(1) + ' KB';
+    }catch(e){ $('#storageSizeLabel').textContent = '-'; }
+    if(lastKnownUpdatedAt){
+      const d = new Date(lastKnownUpdatedAt);
+      $('#lastSavedLabel').textContent = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    } else { $('#lastSavedLabel').textContent = '-'; }
+  }
+
+  // ---------- ✅ 체크리스트 전체 완료 / 초기화 ----------
+  $('#checkAllBtn').addEventListener('click', ()=>{
+    const tab = getActiveTab();
+    if(!tab) return;
+    let n = 0;
+    tab.blocks.forEach(b=>{ if(b.type==='todo' && !b.checked){ b.checked = true; n++; } });
+    if(!n){ showToast('완료할 항목이 없어요'); return; }
+    renderTabs(); renderEditor(); scheduleSave();
+    showToast(n + '개를 완료 처리했어요');
+  });
+  $('#uncheckAllBtn').addEventListener('click', ()=>{
+    const tab = getActiveTab();
+    if(!tab) return;
+    let n = 0;
+    tab.blocks.forEach(b=>{ if(b.type==='todo' && b.checked){ b.checked = false; n++; } });
+    if(!n){ showToast('초기화할 항목이 없어요'); return; }
+    renderTabs(); renderEditor(); scheduleSave();
+    showToast(n + '개를 초기화했어요');
+  });
+
+  // ---------- 탭 병합 ----------
+  function populateMergeSourceSelect(){
+    const sel = $('#mergeSourceSelect');
+    const ws = getActiveWorkspace();
+    const activeTab = getActiveTab();
+    sel.innerHTML = '';
+    if(!ws) return;
+    ws.tabs.filter(t => !activeTab || t.id !== activeTab.id).forEach(t=>{
+      const opt = document.createElement('option');
+      opt.value = t.id;
+      opt.textContent = t.title || t.name || '제목 없는 조사';
+      sel.appendChild(opt);
+    });
+    if(!sel.options.length){
+      const opt = document.createElement('option');
+      opt.textContent = '합칠 다른 탭이 없어요';
+      opt.disabled = true;
+      sel.appendChild(opt);
+    }
+  }
+  $('#mergeTabsBtn').addEventListener('click', ()=>{
+    const ws = getActiveWorkspace();
+    const target = getActiveTab();
+    const sourceId = $('#mergeSourceSelect').value;
+    if(!ws || !target || !sourceId) return;
+    const source = ws.tabs.find(t=>t.id===sourceId);
+    if(!source){ showToast('합칠 탭을 찾을 수 없어요'); return; }
+    if(!confirm('"' + (source.title||source.name||'제목 없는 조사') + '" 탭을 지금 탭("' + (target.title||target.name||'제목 없음') + '") 아래로 합칠까요?\n합쳐진 탭은 휴지통으로 이동해요')) return;
+    target.blocks = target.blocks.concat(
+      newBlock(0, 'h2', escapeHtml(source.title || source.name || '합쳐진 조사')),
+      source.blocks.map(b => ({ ...b, id: uid() }))
+    );
+    ws.tabs = ws.tabs.filter(t => t.id !== source.id);
+    if(!Array.isArray(ws.trash)) ws.trash = [];
+    ws.trash.unshift({ tab: source, deletedAt: Date.now() });
+    ws.trash = ws.trash.slice(0,20);
+    renderTabs(); renderEditor(); scheduleSave();
+    populateMergeSourceSelect();
+    showToast('탭을 합쳤어요');
+  });
+
+  // ---------- 🔒 탭 잠금(비밀번호) ----------
+  const unlockedTabIds = new Set();
+  function simpleHash(str){ return btoa(unescape(encodeURIComponent(str))); }
+  function updateLockBtnLabel(){
+    const tab = getActiveTab();
+    const btn = $('#lockTabBtn');
+    if(!tab){ btn.textContent = '🔒 잠그기/해제'; return; }
+    btn.textContent = (tab.lock && tab.lock.enabled) ? '🔓 잠금 해제' : '🔒 이 탭 잠그기';
+  }
+  $('#lockTabBtn').addEventListener('click', ()=>{
+    const tab = getActiveTab();
+    if(!tab){ showToast('잠글 조사가 없어요'); return; }
+    if(tab.lock && tab.lock.enabled){
+      const pass = prompt('잠금을 해제하려면 비밀번호를 입력해주세요');
+      if(pass === null) return;
+      if(simpleHash(pass) !== tab.lock.pass){ showToast('비밀번호가 틀렸어요', true); return; }
+      tab.lock = null;
+      unlockedTabIds.add(tab.id);
+      showToast('잠금을 해제했어요');
+    } else {
+      const pass = prompt('이 조사를 잠글 비밀번호를 입력해주세요');
+      if(!pass){ return; }
+      const confirmPass = prompt('한번 더 입력해주세요');
+      if(pass !== confirmPass){ showToast('비밀번호가 서로 달라요', true); return; }
+      tab.lock = { enabled: true, pass: simpleHash(pass) };
+      unlockedTabIds.delete(tab.id);
+      showToast('이 조사를 잠갔어요 — 다음에 열 때 비밀번호가 필요해요', true);
+    }
+    updateLockBtnLabel();
+    renderTabs(); scheduleSave();
+  });
+
+  // ---------- ⭐ 즐겨찾기 문단 ----------
+  function scrollToBlockAfterRender(blockId){
+    setTimeout(()=>{
+      const el = $(`.content[data-id="${blockId}"]`);
+      if(!el) return;
+      el.scrollIntoView({ block:'center', behavior:'smooth' });
+      const row = el.closest('.row');
+      if(row){ row.style.outline = '2px solid var(--mustard)'; setTimeout(()=>{ row.style.outline=''; }, 1400); }
+    }, 120);
+  }
+  $('#starredBtn').addEventListener('click', (e)=>{
+    const pop = openInfoPopoverNear(e.target);
+    const ws = getActiveWorkspace();
+    if(!ws){ pop.innerHTML = '<div class="sp-empty">워크스페이스가 없어요</div>'; return; }
+    const entries = [];
+    ws.tabs.forEach(tab=>{
+      (tab.blocks||[]).forEach(b=>{
+        if(!b.starred) return;
+        const text = (b.html||'').replace(/<[^>]+>/g,' ').trim() || '(빈 줄)';
+        entries.push({ tabId: tab.id, blockId: b.id, tabTitle: tab.title || tab.name || '제목 없음', text });
+      });
+    });
+    if(!entries.length){
+      pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">즐겨찾기 문단</h4><div class="sp-empty">줄 왼쪽의 ☆를 눌러 즐겨찾기해보세요</div><button id="starredCloseBtn">닫기</button>';
+    } else {
+      const rows = entries.map(en => `<div class="list-row-item"><span class="lri-info">${escapeHtml(en.text.slice(0,60))}<div class="lri-sub">${escapeHtml(en.tabTitle)}</div></span><button type="button" data-goto-tab="${en.tabId}" data-goto-block="${en.blockId}">이동</button></div>`).join('');
+      pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">즐겨찾기 문단 (' + entries.length + '개)</h4>' + rows + '<button id="starredCloseBtn">닫기</button>';
+    }
+    $$('[data-goto-tab]', pop).forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        pop.style.display = 'none';
+        closeSettingsPanel();
+        await switchToTab(btn.dataset.gotoTab);
+        scrollToBlockAfterRender(btn.dataset.gotoBlock);
+      });
+    });
+    $('#starredCloseBtn', pop).addEventListener('click', ()=>{ pop.style.display='none'; });
+  });
+
+  // ---------- 🧾 목차 (제목 모아보기) ----------
+  $('#tocBtn').addEventListener('click', (e)=>{
+    const pop = openInfoPopoverNear(e.target);
+    const tab = getActiveTab();
+    if(!tab){ pop.innerHTML = '<div class="sp-empty">열려있는 조사가 없어요</div>'; return; }
+    const headers = tab.blocks.filter(b => b.type === 'h1' || b.type === 'h2' || b.type === 'h3');
+    if(!headers.length){
+      pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">목차</h4><div class="sp-empty">제목(H1~H3)을 넣으면 여기 모여요</div><button id="tocCloseBtn">닫기</button>';
+    } else {
+      const rows = headers.map(b=>{
+        const text = (b.html||'').replace(/<[^>]+>/g,' ').trim() || '(제목 없음)';
+        const indent = b.type==='h1' ? 0 : (b.type==='h2' ? 14 : 28);
+        return `<div class="list-row-item" style="padding-left:${indent}px;"><span class="lri-info" style="cursor:pointer;" data-toc-jump="${b.id}">${escapeHtml(text)}</span></div>`;
+      }).join('');
+      pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">목차 (' + headers.length + '개)</h4>' + rows + '<button id="tocCloseBtn">닫기</button>';
+    }
+    $$('[data-toc-jump]', pop).forEach(el=>{
+      el.addEventListener('click', ()=>{ pop.style.display = 'none'; closeSettingsPanel(); scrollToBlockAfterRender(el.dataset.tocJump); });
+    });
+    $('#tocCloseBtn', pop)?.addEventListener('click', ()=>{ pop.style.display = 'none'; });
+  });
+
+  // ---------- 📝 할 일 모아보기 (현재 워크스페이스 전체 미완료 항목) ----------
+  function renderTodosOverview(){
+    const pop = $('#infoPopover');
+    const ws = getActiveWorkspace();
+    if(!ws){ pop.innerHTML = '<div class="sp-empty">워크스페이스가 없어요</div>'; return; }
+    const entries = [];
+    ws.tabs.forEach(tab=>{
+      (tab.blocks||[]).forEach(b=>{
+        if(b.type !== 'todo' || b.checked) return;
+        entries.push({
+          tabId: tab.id, blockId: b.id,
+          tabTitle: tab.title || tab.name || '제목 없음',
+          text: (b.html||'').replace(/<[^>]+>/g,' ').trim() || '(빈 항목)',
+          due: b.due || null
+        });
+      });
+    });
+    entries.sort((a,b)=>{
+      if(a.due && b.due) return a.due.localeCompare(b.due);
+      if(a.due) return -1;
+      if(b.due) return 1;
+      return 0;
+    });
+    if(!entries.length){
+      pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">할 일 모아보기</h4><div class="sp-empty">미완료 할 일이 없어요 🎉</div><button id="todoOvCloseBtn">닫기</button>';
+    } else {
+      const rows = entries.map(en=>{
+        const dueLabel = en.due ? ` <span style="color:var(--ink-faint);">(${escapeHtml(en.due)})</span>` : '';
+        return `<div class="list-row-item"><span class="lri-info">${escapeHtml(en.text.slice(0,50))}${dueLabel}<div class="lri-sub">${escapeHtml(en.tabTitle)}</div></span><button type="button" data-todo-done="${en.tabId}|${en.blockId}">완료</button><button type="button" data-todo-goto="${en.tabId}|${en.blockId}">이동</button></div>`;
+      }).join('');
+      pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">할 일 모아보기 (' + entries.length + '개)</h4>' + rows + '<button id="todoOvCloseBtn">닫기</button>';
+    }
+    $$('[data-todo-done]', pop).forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const [tabId, blockId] = btn.dataset.todoDone.split('|');
+        const t = ws.tabs.find(x=>x.id===tabId);
+        const b = t && t.blocks.find(x=>x.id===blockId);
+        if(!b) return;
+        b.checked = true;
+        scheduleSave();
+        const cur = getActiveTab();
+        if(cur && cur.id === t.id){ renderTabs(); renderEditor(); }
+        showToast('완료 처리했어요');
+        renderTodosOverview();
+      });
+    });
+    $$('[data-todo-goto]', pop).forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        const [tabId, blockId] = btn.dataset.todoGoto.split('|');
+        pop.style.display = 'none';
+        closeSettingsPanel();
+        await switchToTab(tabId);
+        scrollToBlockAfterRender(blockId);
+      });
+    });
+    $('#todoOvCloseBtn', pop)?.addEventListener('click', ()=>{ pop.style.display = 'none'; });
+  }
+  $('#todosOverviewBtn').addEventListener('click', (e)=>{
+    openInfoPopoverNear(e.target);
+    renderTodosOverview();
+  });
+
+  // ---------- 전체 데이터 초기화 ----------
+  $('#resetAllBtn').addEventListener('click', ()=>{
+    const input = prompt('정말 모든 워크스페이스와 조사 내용을 지울까요?\n계속하려면 "삭제"라고 입력해주세요');
+    if(input !== '삭제') return;
+    const w = newWorkspace('기본 워크스페이스');
+    profile.workspaces = [w];
+    profile.activeWorkspaceId = w.id;
+    profile.recentTabs = [];
+    closeSettingsPanel();
+    showWorkspaceScreen();
+    scheduleSave();
+    showToast('모든 데이터를 초기화했어요', true);
+  });
+
+  // ---------- 표시 이름(별명) ----------
+  $('#nicknameBtn').addEventListener('click', ()=>{
+    const input = prompt('다른 사람에게 보여질 별명을 입력해주세요 (비워두면 원래 이름을 써요)', profile.settings.nickname || '');
+    if(input === null) return;
+    profile.settings.nickname = input.trim();
+    applyIdentityLabels();
+    scheduleSave();
+  });
+  function applyIdentityLabels(){
+    const display = (profile.settings && profile.settings.nickname) || profile.name;
+    $('#userNameLabel').textContent = display;
+    $('#avatarInitial').textContent = display.slice(0,1);
+    $('#wsUserLabel').textContent = display + '님';
+  }
+
+  // ---------- 다른 이름으로 전환 ----------
+  $('#switchAccountBtn').addEventListener('click', async ()=>{
+    const name = prompt('전환할 이름을 입력해주세요');
+    if(!name || !name.trim()) return;
+    await saveProfile();
+    closeSettingsPanel();
+    await doLogin(name.trim());
+  });
+
+  // ---------- (moved) trash / snapshot / tags / stats buttons still work via their existing handlers below ----------
+  const ARROW_PATTERNS = [ ['<->','↔'], ['->','→'], ['<-','←'], ['=>','⇒'], ['<=','⇐'] ];
+  function autoReplaceArrowAtCaret(el){
+    const sel = window.getSelection();
+    if(!sel.rangeCount) return false;
+    const range = sel.getRangeAt(0);
+    if(!range.collapsed) return false;
+    const node = range.startContainer;
+    if(node.nodeType !== 3) return false;
+    const offset = range.startOffset;
+    const text = node.textContent;
+    const before = text.slice(0, offset);
+    for(const [pat, rep] of ARROW_PATTERNS){
+      if(before.endsWith(pat)){
+        const start = offset - pat.length;
+        node.textContent = text.slice(0, start) + rep + text.slice(offset);
+        const newRange = document.createRange();
+        newRange.setStart(node, start + 1);
+        newRange.collapse(true);
+        sel.removeAllRanges(); sel.addRange(newRange);
+        return true;
+      }
+    }
+    return false;
   }
 
   // ---------- markdown-style auto transform ----------
@@ -1540,7 +2782,19 @@
         block.html = el.innerHTML;
         updateWordCount();
         scheduleSave();
-      }).catch(()=> showToast('이미지를 붙여넣는 데 실패했어요'));
+      }).catch(()=> showToast('이미지를 붙여넣는 데 실패했어요', true));
+      return;
+    }
+    // pasting a bare URL by itself → turn it straight into a clickable link
+    const pastedText = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
+    const trimmed = (pastedText || '').trim();
+    if(trimmed && /^https?:\/\/\S+$/i.test(trimmed) && !/\s/.test(trimmed)){
+      e.preventDefault();
+      const safeHref = escapeHtml(trimmed);
+      document.execCommand('insertHTML', false, `<a href="${safeHref}">${safeHref}</a>`);
+      block.html = el.innerHTML;
+      updateWordCount();
+      scheduleSave();
       return;
     }
     // plain text / rich text: let the browser paste normally,
@@ -1568,6 +2822,20 @@
 
     if(e.key === 'Enter' && !e.shiftKey){
       e.preventDefault();
+
+      if(!isListType){
+        const trimmed = el.textContent.trim();
+        const listStarterType = trimmed === '-' || trimmed === '*' ? 'bullet' : (trimmed === '1.' ? 'ordered' : (trimmed === '[]' ? 'todo' : null));
+        if(listStarterType){
+          block.type = listStarterType;
+          block.html = '';
+          block.checked = false;
+          const nb = newBlock(block.level, listStarterType, '');
+          tab.blocks.splice(idx+1, 0, nb);
+          renderEditor(); scheduleSave(); focusBlock(nb.id, true);
+          return;
+        }
+      }
 
       if(isListType){
         if(el.textContent.trim()===''){
@@ -1665,6 +2933,16 @@
     sel.removeAllRanges(); sel.addRange(range);
   }
 
+  function moveBlock(blockId, delta){
+    const tab = getActiveTab();
+    if(!tab) return;
+    const i = tab.blocks.findIndex(b=>b.id===blockId);
+    const j = i + delta;
+    if(i < 0 || j < 0 || j >= tab.blocks.length) return;
+    [tab.blocks[i], tab.blocks[j]] = [tab.blocks[j], tab.blocks[i]];
+    renderEditor(); scheduleSave(); focusBlock(blockId, false);
+  }
+
   function focusBlock(id, atStart){
     setTimeout(()=>{
       const el = $(`.content[data-id="${id}"]`);
@@ -1732,6 +3010,31 @@
     syncActiveBlockHtml();
   });
 
+  $$('.row-bg-swatches .sw').forEach(sw=>{
+    sw.addEventListener('mousedown', e=>e.preventDefault());
+    sw.addEventListener('click', ()=>{
+      const tab = getActiveTab();
+      const block = tab && tab.blocks.find(b=>b.id===activeRowId);
+      if(!block){ showToast('배경을 적용할 문단을 먼저 클릭해주세요'); return; }
+      block.bg = sw.dataset.rowbg || '';
+      renderEditor(); scheduleSave(); focusBlock(block.id, false);
+    });
+  });
+
+  $('#dateInsertBtn').addEventListener('mousedown', e=>e.preventDefault());
+  $('#dateInsertBtn').addEventListener('click', ()=>{
+    const el = document.activeElement && document.activeElement.classList.contains('content')
+      ? document.activeElement
+      : $(`.content[data-id="${activeRowId}"]`);
+    if(!el){ showToast('날짜를 넣을 문단을 먼저 클릭해주세요'); return; }
+    el.focus();
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    const str = `${now.getFullYear()}.${pad(now.getMonth()+1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    document.execCommand('insertText', false, str);
+    syncActiveBlockHtml();
+  });
+
   $('#fontSelect').addEventListener('mousedown', e=>e.stopPropagation());
   $('#fontSelect').addEventListener('change', (e)=>{
     document.execCommand('fontName', false, e.target.value);
@@ -1779,7 +3082,28 @@
       restoreLastSelection();
       document.execCommand('insertHTML', false, buildImageEmbedHtml(dataUrl));
       syncActiveBlockHtml();
-    }catch(err){ showToast('이미지를 불러오지 못했어요'); }
+    }catch(err){ showToast('이미지를 불러오지 못했어요', true); }
+  });
+
+  $('#fileAttachBtn').addEventListener('mousedown', (e)=>{
+    e.preventDefault();
+    const sel = window.getSelection();
+    if(sel.rangeCount) lastSelectionRange = sel.getRangeAt(0).cloneRange();
+  });
+  $('#fileAttachBtn').addEventListener('click', ()=>{ $('#fileAttachInput').click(); });
+  $('#fileAttachInput').addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    e.target.value = '';
+    if(!file) return;
+    if(file.size > 8 * 1024 * 1024){ showToast('8MB 이하 파일만 첨부할 수 있어요', true); return; }
+    try{
+      const dataUrl = await readFileAsDataURL(file);
+      restoreLastSelection();
+      const chip = `<a href="${dataUrl}" download="${escapeHtml(file.name)}" class="file-attach">📎 ${escapeHtml(file.name)}</a>&nbsp;`;
+      document.execCommand('insertHTML', false, chip);
+      syncActiveBlockHtml();
+      showToast('파일을 첨부했어요 — 클릭하면 내려받아요');
+    }catch(err){ showToast('파일을 불러오지 못했어요', true); }
   });
 
   function restoreLastSelection(){
@@ -1998,48 +3322,160 @@
       pop.style.display = 'none';
     }
     const infoPop = $('#infoPopover');
-    if(infoPop.style.display === 'block' && !infoPop.contains(e.target) && e.target.id !== 'shortcutsBtn' && e.target.id !== 'sourcesBtn'){
+    const infoTriggerIds = ['shortcutsBtn','sourcesBtn','trashBtn','snapshotBtn','tagsBtn','statsBtn','starredBtn','tocBtn','todosOverviewBtn'];
+    if(infoPop.style.display === 'block' && !infoPop.contains(e.target) && !infoTriggerIds.includes(e.target.id)){
       infoPop.style.display = 'none';
       infoPop.style.transform = '';
     }
   });
 
-  // ---------- search ----------
+  // ---------- search (with match count + highlight) & find-replace ----------
+  let searchMarks = [];
+  let searchIndex = -1;
+
+  function clearSearchMarks(){
+    $$('mark.search-hit').forEach(m=>{
+      const parent = m.parentNode;
+      if(!parent) return;
+      parent.replaceChild(document.createTextNode(m.textContent), m);
+      parent.normalize();
+    });
+    searchMarks = [];
+    searchIndex = -1;
+  }
+
+  function runSearch(query){
+    clearSearchMarks();
+    if(!query){ $('#searchCount').textContent = ''; return; }
+    const q = query.toLowerCase();
+    $$('.row .content').forEach(contentEl=>{
+      const walker = document.createTreeWalker(contentEl, NodeFilter.SHOW_TEXT);
+      const textNodes = [];
+      let n;
+      while(n = walker.nextNode()) textNodes.push(n);
+      textNodes.forEach(node=>{
+        const text = node.textContent;
+        const lower = text.toLowerCase();
+        if(!lower.includes(q)) return;
+        const frag = document.createDocumentFragment();
+        let last = 0, idx;
+        while((idx = lower.indexOf(q, last)) !== -1){
+          if(idx > last) frag.appendChild(document.createTextNode(text.slice(last, idx)));
+          const mark = document.createElement('mark');
+          mark.className = 'search-hit';
+          mark.textContent = text.slice(idx, idx + q.length);
+          frag.appendChild(mark);
+          searchMarks.push(mark);
+          last = idx + q.length;
+        }
+        if(last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+        node.parentNode.replaceChild(frag, node);
+      });
+    });
+    $('#searchCount').textContent = searchMarks.length ? `0/${searchMarks.length}` : '0개';
+    if(searchMarks.length) goToMatch(0);
+  }
+
+  function goToMatch(i){
+    if(!searchMarks.length) return;
+    if(searchIndex >= 0 && searchMarks[searchIndex]) searchMarks[searchIndex].style.outline = '';
+    searchIndex = (i + searchMarks.length) % searchMarks.length;
+    const mark = searchMarks[searchIndex];
+    mark.style.outline = '2px solid var(--terracotta)';
+    mark.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    $('#searchCount').textContent = `${searchIndex+1}/${searchMarks.length}`;
+  }
+
   $('#searchToggleBtn').addEventListener('click', ()=>{
     const box = $('#searchBox');
     box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
     if(box.style.display === 'flex') $('#searchInput').focus();
+    else clearSearchMarks();
   });
-  $('#searchCloseBtn').addEventListener('click', ()=>{ $('#searchBox').style.display = 'none'; });
-  function doFind(backwards){
-    const q = $('#searchInput').value;
-    if(!q) return;
-    if(window.find){ window.find(q, false, !!backwards, true); }
+  $('#searchCloseBtn').addEventListener('click', ()=>{
+    $('#searchBox').style.display = 'none';
+    clearSearchMarks();
+  });
+  $('#searchInput').addEventListener('input', (e)=> runSearch(e.target.value));
+  $('#searchNextBtn').addEventListener('click', ()=> goToMatch(searchIndex+1));
+  $('#searchPrevBtn').addEventListener('click', ()=> goToMatch(searchIndex-1));
+  $('#searchInput').addEventListener('keydown', (e)=>{
+    if(e.key==='Enter') goToMatch(e.shiftKey ? searchIndex-1 : searchIndex+1);
+  });
+
+  // ---------- 찾아 바꾸기 (find & replace across the whole tab) ----------
+  function replaceAllInTab(find, replace){
+    if(!find) return 0;
+    const tab = getActiveTab();
+    if(!tab) return 0;
+    let count = 0;
+    tab.blocks.forEach(block=>{
+      if(!block.html || !block.html.toLowerCase().includes(find.toLowerCase())) return;
+      const div = document.createElement('div');
+      div.innerHTML = block.html;
+      const walker = document.createTreeWalker(div, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      let n;
+      while(n = walker.nextNode()) nodes.push(n);
+      nodes.forEach(node=>{
+        const lower = node.textContent.toLowerCase();
+        if(!lower.includes(find.toLowerCase())) return;
+        const re = new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        const occurrences = (node.textContent.match(re) || []).length;
+        node.textContent = node.textContent.replace(re, replace);
+        count += occurrences;
+      });
+      block.html = div.innerHTML;
+    });
+    return count;
   }
-  $('#searchNextBtn').addEventListener('click', ()=>doFind(false));
-  $('#searchPrevBtn').addEventListener('click', ()=>doFind(true));
-  $('#searchInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') doFind(e.shiftKey); });
+  $('#replaceAllBtn').addEventListener('click', ()=>{
+    const find = $('#searchInput').value;
+    const replace = $('#replaceInput').value;
+    if(!find){ showToast('먼저 찾을 내용을 입력해주세요'); return; }
+    const n = replaceAllInTab(find, replace);
+    if(n > 0){
+      clearSearchMarks();
+      renderEditor();
+      scheduleSave();
+      showToast(n + '군데를 바꿨어요');
+    } else {
+      showToast('일치하는 내용을 찾지 못했어요');
+    }
+  });
 
   // ---------- export to PDF / print ----------
-  function buildPrintHtml(tab, docTitle, docAuthor){
+  // Clone the *actual* rendered note (same classes, same width, same font as
+  // the live editor) so line-wrap points match exactly what's on screen —
+  // no more re-deriving a separate print layout that wraps differently.
+  function buildPrintOutlineHtml(){
+    const clone = $('#outline').cloneNode(true);
+    clone.querySelectorAll('.toggle, .dup-row, .collapsed-badge').forEach(el => el.remove());
+    clone.querySelectorAll('.img-toolbar, .img-resize-handle').forEach(el => el.remove());
+    // drop links themselves for print, keep only the plain visible text
+    clone.querySelectorAll('a').forEach(a => a.replaceWith(document.createTextNode(a.textContent)));
+    clone.querySelectorAll('.content').forEach(el=>{
+      el.removeAttribute('contenteditable');
+      el.removeAttribute('spellcheck');
+    });
+    // real <input type=checkbox> can print inconsistently across browsers — use a plain symbol instead
+    clone.querySelectorAll('.row[data-type="todo"] .marker').forEach(marker=>{
+      const checked = marker.closest('.row').classList.contains('checked');
+      marker.innerHTML = '';
+      marker.textContent = checked ? '☑' : '☐';
+    });
+    return clone.innerHTML;
+  }
+
+  function buildPrintHtml(docTitle, docAuthor){
     let html = '<div class="print-doc-title">' + escapeHtml(docTitle) + '</div>';
     if(docAuthor) html += '<div class="print-doc-author">' + escapeHtml(docAuthor) + '</div>';
-    tab.blocks.forEach((block, idx)=>{
-      const indent = block.level * 22;
-      let marker = '';
-      if(block.type === 'bullet') marker = '<span class="print-marker">•</span>';
-      else if(block.type === 'ordered') marker = '<span class="print-marker">' + computeOrderedIndex(tab.blocks, idx) + '.</span>';
-      else if(block.type === 'todo') marker = '<span class="print-marker">' + (block.checked ? '☑' : '☐') + '</span>';
-      const checkedClass = (block.type === 'todo' && block.checked) ? ' print-checked' : '';
-      html += '<div class="print-row print-type-' + block.type + checkedClass + '" style="margin-left:' + indent + 'px">'
-        + marker
-        + '<div class="print-content">' + (block.html || '') + '</div>'
-        + '</div>';
-    });
+    html += '<div class="outline">' + buildPrintOutlineHtml() + '</div>';
     return html;
   }
 
   let originalDocTitle = document.title;
+  let printWasDark = false;
   $('#exportPdfBtn').addEventListener('click', ()=>{
     const tab = getActiveTab();
     if(!tab){ showToast('내보낼 조사가 없어요'); return; }
@@ -2049,13 +3485,21 @@
     const docAuthor = prompt('작성자 이름을 입력해주세요 (비워두면 표시 안 함)', profile ? profile.name : '');
     if(docAuthor === null) return;
 
-    $('#printArea').innerHTML = buildPrintHtml(tab, docTitle || '제목 없음', (docAuthor||'').trim());
+    // always print on a plain light background, regardless of dark mode,
+    // and restore it right after so the on-screen view is untouched
+    printWasDark = document.body.classList.contains('dark');
+    if(printWasDark) document.body.classList.remove('dark');
+
+    $('#printArea').innerHTML = buildPrintHtml(docTitle || '제목 없음', (docAuthor||'').trim());
     originalDocTitle = document.title;
     document.title = docTitle || tab.title || tab.name || '생각 정리 노트';
-    showToast('인쇄창에서 "자세히" → "머리글과 바닥글" 체크를 꺼주시면 날짜·주소 없이 깔끔하게 나와요');
+    showToast('화면에서 보던 줄바꿈 그대로 인쇄돼요');
     setTimeout(()=> window.print(), 400);
   });
-  window.addEventListener('afterprint', ()=>{ document.title = originalDocTitle; });
+  window.addEventListener('afterprint', ()=>{
+    document.title = originalDocTitle;
+    if(printWasDark){ document.body.classList.add('dark'); printWasDark = false; }
+  });
 
   // ---------- spell check (Korean, via a Firebase Function you deploy) ----------
   const SPELLCHECK_URL_KEY = 'tamgu-spellcheck-url';
@@ -2225,6 +3669,279 @@
     $('#ccpCloseBtn3', pop).addEventListener('click', ()=>{ pop.style.display='none'; });
   });
 
+  // ---------- 🗑 휴지통: restore or purge deleted tabs ----------
+  function openInfoPopoverNear(el){
+    const pop = $('#infoPopover');
+    pop.style.display = 'block';
+    pop.style.width = '320px';
+    pop.style.maxHeight = '420px';
+    pop.style.transform = '';
+    const rect = el.getBoundingClientRect();
+    pop.style.left = Math.max(10, Math.min(rect.left, window.innerWidth-330)) + 'px';
+    pop.style.top = Math.min(rect.bottom+8, window.innerHeight-440) + 'px';
+    return pop;
+  }
+  function renderTrashPopover(){
+    const ws = getActiveWorkspace();
+    const pop = $('#infoPopover');
+    const trash = (ws && ws.trash) || [];
+    if(!trash.length){
+      pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">휴지통</h4><div class="sp-empty">삭제된 탭이 없어요</div><button id="trashCloseBtn">닫기</button>';
+    } else {
+      const rows = trash.map((entry, i)=>{
+        const d = new Date(entry.deletedAt);
+        const dateStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        return `<div class="list-row-item">
+          <span class="lri-info">${escapeHtml(entry.tab.title || entry.tab.name || '제목 없는 조사')}<div class="lri-sub">${dateStr} 삭제됨</div></span>
+          <button type="button" data-restore="${i}">복원</button>
+          <button type="button" data-purge="${i}">완전삭제</button>
+        </div>`;
+      }).join('');
+      pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">휴지통 (' + trash.length + '개)</h4>' + rows + '<button id="trashCloseBtn">닫기</button>';
+    }
+    $$('[data-restore]', pop).forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = Number(btn.dataset.restore);
+        const entry = ws.trash[i];
+        if(!entry) return;
+        ws.tabs.push(entry.tab);
+        ws.trash.splice(i,1);
+        ws.activeTabId = entry.tab.id;
+        renderTabs(); renderEditor(); scheduleSave();
+        pop.style.display = 'none';
+        showToast('탭을 복원했어요');
+      });
+    });
+    $$('[data-purge]', pop).forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const i = Number(btn.dataset.purge);
+        if(!confirm('완전히 삭제하면 되돌릴 수 없어요. 계속할까요?')) return;
+        ws.trash.splice(i,1);
+        scheduleSave();
+        renderTrashPopover();
+      });
+    });
+    $('#trashCloseBtn', pop).addEventListener('click', ()=>{ pop.style.display='none'; });
+  }
+  $('#trashBtn').addEventListener('click', (e)=>{
+    openInfoPopoverNear(e.target);
+    renderTrashPopover();
+  });
+
+  // ---------- 📸 스냅샷: save/restore a version of the current tab ----------
+  // ---------- 자동 일일 스냅샷: 하루에 한 번, 탭을 열 때 그날 첫 상태를 남겨둠 ----------
+  function maybeAutoSnapshot(tab){
+    if(!tab) return;
+    const today = new Date().toISOString().slice(0,10);
+    if(tab._autoSnapDate === today) return;
+    if(!Array.isArray(tab.snapshots)) tab.snapshots = [];
+    tab.snapshots.unshift({ label: '자동 저장 ' + today, savedAt: Date.now(), title: tab.title, blocks: JSON.parse(JSON.stringify(tab.blocks)), auto: true });
+    tab.snapshots = tab.snapshots.slice(0,15);
+    tab._autoSnapDate = today;
+    scheduleSave();
+  }
+
+  function renderSnapshotPopover(){
+    const tab = getActiveTab();
+    const pop = $('#infoPopover');
+    if(!tab){ pop.innerHTML = '<div class="sp-empty">열려있는 조사가 없어요</div>'; pop.style.display='block'; return; }
+    if(!Array.isArray(tab.snapshots)) tab.snapshots = [];
+    const rows = tab.snapshots.map((snap, i)=>{
+      const d = new Date(snap.savedAt);
+      const dateStr = `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      return `<div class="list-row-item">
+        <span class="lri-info">${escapeHtml(snap.label || '스냅샷')}<div class="lri-sub">${dateStr}</div></span>
+        <button type="button" data-snap-restore="${i}">복원</button>
+        <button type="button" data-snap-del="${i}">삭제</button>
+      </div>`;
+    }).join('');
+    pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">이 조사의 스냅샷</h4>'
+      + (rows || '<div class="sp-empty">아직 저장된 스냅샷이 없어요</div>')
+      + '<button id="snapSaveBtn">📸 지금 상태 저장하기</button>'
+      + '<button id="snapCloseBtn">닫기</button>';
+    $$('[data-snap-restore]', pop).forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const snap = tab.snapshots[Number(btn.dataset.snapRestore)];
+        if(!snap) return;
+        if(!confirm('"' + (snap.label||'스냅샷') + '" 상태로 되돌릴까요? 지금 내용은 사라져요 (되돌리기 전 스냅샷도 남길 수 있어요)')) return;
+        tab.title = snap.title;
+        tab.blocks = JSON.parse(JSON.stringify(snap.blocks));
+        renderTabs(); renderEditor(); scheduleSave();
+        pop.style.display = 'none';
+        showToast('스냅샷으로 복원했어요');
+      });
+    });
+    $$('[data-snap-del]', pop).forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        tab.snapshots.splice(Number(btn.dataset.snapDel),1);
+        scheduleSave();
+        renderSnapshotPopover();
+      });
+    });
+    $('#snapSaveBtn', pop).addEventListener('click', ()=>{
+      const label = prompt('스냅샷 이름을 입력해주세요', new Date().toLocaleDateString('ko-KR'));
+      if(label === null) return;
+      tab.snapshots.unshift({ label: label.trim() || '스냅샷', savedAt: Date.now(), title: tab.title, blocks: JSON.parse(JSON.stringify(tab.blocks)) });
+      tab.snapshots = tab.snapshots.slice(0,15);
+      scheduleSave();
+      renderSnapshotPopover();
+      showToast('스냅샷을 저장했어요');
+    });
+    $('#snapCloseBtn', pop).addEventListener('click', ()=>{ pop.style.display='none'; });
+  }
+  $('#snapshotBtn').addEventListener('click', (e)=>{
+    openInfoPopoverNear(e.target);
+    renderSnapshotPopover();
+  });
+
+  // ---------- 🏷 태그 모아보기 ----------
+  $('#tagsBtn').addEventListener('click', (e)=>{
+    const tab = getActiveTab();
+    const pop = openInfoPopoverNear(e.target);
+    if(!tab){ pop.innerHTML = '<div class="sp-empty">열려있는 조사가 없어요</div>'; return; }
+    const text = tab.blocks.map(b=>(b.html||'').replace(/<[^>]+>/g,' ')).join(' ');
+    const found = text.match(/#[\w가-힣_-]+/g) || [];
+    const tags = Array.from(new Set(found));
+    if(!tags.length){
+      pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">태그</h4><div class="sp-empty">본문에 #태그를 적으면 여기 모여요</div><button id="tagsCloseBtn">닫기</button>';
+    } else {
+      const chips = tags.map(t=>`<span style="display:inline-block;border:1.5px solid var(--line);border-radius:8px;padding:4px 9px;margin:3px 4px 0 0;font-size:12.5px;color:var(--ink);">${escapeHtml(t)}</span>`).join('');
+      pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">이 조사의 태그 (' + tags.length + '개)</h4><div>' + chips + '</div><button id="tagsCloseBtn">닫기</button>';
+    }
+    $('#tagsCloseBtn', pop).addEventListener('click', ()=>{ pop.style.display='none'; });
+  });
+
+  // ---------- 📊 전체 통계 ----------
+  $('#statsBtn').addEventListener('click', (e)=>{
+    const pop = openInfoPopoverNear(e.target);
+    let tabCount = 0, charCount = 0, wordCount = 0, todoTotal = 0, todoDone = 0;
+    profile.workspaces.forEach(ws=>{
+      tabCount += ws.tabs.length;
+      ws.tabs.forEach(t=>{
+        const text = (t.blocks||[]).map(b=>(b.html||'').replace(/<[^>]+>/g,' ')).join(' ').replace(/\s+/g,' ').trim();
+        charCount += text.length;
+        wordCount += text ? text.split(' ').filter(Boolean).length : 0;
+        (t.blocks||[]).forEach(b=>{ if(b.type==='todo'){ todoTotal++; if(b.checked) todoDone++; } });
+      });
+    });
+    const rows = [
+      ['워크스페이스', profile.workspaces.length + '개'],
+      ['전체 조사 탭', tabCount + '개'],
+      ['전체 글자수', charCount + '자'],
+      ['전체 단어수', wordCount + '개'],
+      ['할 일 진행률', todoTotal ? (todoDone + '/' + todoTotal + ' (' + Math.round(todoDone/todoTotal*100) + '%)') : '없음'],
+    ];
+    const body = rows.map(([k,v])=>`<div class="ccp-row" style="display:flex;justify-content:space-between;gap:14px;"><span>${escapeHtml(k)}</span><b>${escapeHtml(v)}</b></div>`).join('');
+    pop.innerHTML = '<h4 style="margin:0 0 8px;font-size:13px;color:var(--ink-soft);font-weight:700;">전체 통계</h4>' + body + '<button id="statsCloseBtn">닫기</button>';
+    $('#statsCloseBtn', pop).addEventListener('click', ()=>{ pop.style.display='none'; });
+  });
+
+  // ---------- Ctrl+K 커맨드 팔레트: jump to any tab in any workspace ----------
+  let cmdSelIndex = 0;
+  let cmdEntries = [];
+  function buildCmdEntries(){
+    const entries = [];
+    profile.workspaces.forEach(ws=>{
+      ws.tabs.forEach(tab=>{
+        const contentText = (tab.blocks||[]).map(b=>(b.html||'').replace(/<[^>]+>/g,' ')).join(' ').replace(/\s+/g,' ').trim();
+        entries.push({ wsId: ws.id, wsName: ws.name, wsEmoji: ws.emoji, tabId: tab.id, title: tab.title || tab.name || '제목 없는 조사', contentText });
+      });
+    });
+    return entries;
+  }
+  function renderCmdList(query){
+    const list = $('#cmdList');
+    const q = (query||'').trim().toLowerCase();
+    const filtered = cmdEntries.filter(e => !q
+      || e.title.toLowerCase().includes(q)
+      || (e.wsName||'').toLowerCase().includes(q)
+      || (e.contentText||'').toLowerCase().includes(q));
+    cmdSelIndex = 0;
+    if(!filtered.length){ list.innerHTML = '<div class="cmd-empty">일치하는 탭이 없어요</div>'; return; }
+    list.innerHTML = filtered.map((e,i)=>{
+      const titleMatches = !q || e.title.toLowerCase().includes(q);
+      const hint = (q && !titleMatches) ? '<span class="cmd-ws" style="margin-left:6px;">본문 일치</span>' : '';
+      return `<div class="cmd-item${i===0?' sel':''}" data-idx="${i}"><span>${e.wsEmoji||'🗂️'} ${escapeHtml(e.title)}${hint}</span><span class="cmd-ws">${escapeHtml(e.wsName||'')}</span></div>`;
+    }).join('');
+    list._filtered = filtered;
+    $$('.cmd-item', list).forEach(item=>{
+      item.addEventListener('click', ()=> jumpToCmdEntry(filtered[Number(item.dataset.idx)]));
+    });
+  }
+  async function jumpToCmdEntry(entry){
+    if(!entry) return;
+    closeCmdPalette();
+    if(entry.wsId !== profile.activeWorkspaceId){
+      profile.activeWorkspaceId = entry.wsId;
+      $('#workspaceScreen').classList.remove('active');
+      $('#app').classList.add('active');
+    }
+    await switchToTab(entry.tabId);
+  }
+  function openCmdPalette(){
+    if(!profile || !$('#app').classList.contains('active')) return;
+    cmdEntries = buildCmdEntries();
+    $('#cmdPalette').classList.add('active');
+    $('#cmdInput').value = '';
+    renderCmdList('');
+    setTimeout(()=>$('#cmdInput').focus(), 30);
+  }
+  function closeCmdPalette(){ $('#cmdPalette').classList.remove('active'); }
+  $('#cmdInput').addEventListener('input', (e)=> renderCmdList(e.target.value));
+  $('#cmdInput').addEventListener('keydown', (e)=>{
+    const list = $('#cmdList');
+    const items = $$('.cmd-item', list);
+    if(e.key === 'Escape'){ closeCmdPalette(); return; }
+    if(e.key === 'ArrowDown'){ e.preventDefault(); cmdSelIndex = Math.min(cmdSelIndex+1, items.length-1); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); cmdSelIndex = Math.max(cmdSelIndex-1, 0); }
+    else if(e.key === 'Enter'){ e.preventDefault(); const f = list._filtered||[]; jumpToCmdEntry(f[cmdSelIndex]); return; }
+    else return;
+    items.forEach((it,i)=> it.classList.toggle('sel', i===cmdSelIndex));
+  });
+  $('#cmdPalette').addEventListener('mousedown', (e)=>{ if(e.target.id === 'cmdPalette') closeCmdPalette(); });
+  document.addEventListener('keydown', (e)=>{
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k'){
+      e.preventDefault();
+      if($('#cmdPalette').classList.contains('active')) closeCmdPalette();
+      else openCmdPalette();
+    }
+  });
+
+  // ---------- 🖱️ image drag & drop into the note ----------
+  const docScrollEl = $('.doc-scroll');
+  docScrollEl.addEventListener('dragover', (e)=>{ e.preventDefault(); docScrollEl.classList.add('drag-over'); });
+  docScrollEl.addEventListener('dragleave', ()=>{ docScrollEl.classList.remove('drag-over'); });
+  docScrollEl.addEventListener('drop', async (e)=>{
+    e.preventDefault();
+    docScrollEl.classList.remove('drag-over');
+    const files = Array.from((e.dataTransfer && e.dataTransfer.files) || []).filter(f=>f.type.startsWith('image/'));
+    if(!files.length) return;
+    let targetEl = null;
+    if(document.caretRangeFromPoint){
+      const r = document.caretRangeFromPoint(e.clientX, e.clientY);
+      targetEl = r && r.startContainer && r.startContainer.nodeType===3 ? r.startContainer.parentElement.closest('.content') : (r && r.startContainer && r.startContainer.closest && r.startContainer.closest('.content'));
+      if(targetEl){
+        const sel = window.getSelection();
+        sel.removeAllRanges(); sel.addRange(r);
+      }
+    }
+    if(!targetEl){
+      const rows = $$('.content');
+      targetEl = rows[rows.length-1];
+      if(targetEl) placeCaretEnd(targetEl);
+    }
+    if(!targetEl) return;
+    targetEl.focus();
+    for(const file of files){
+      try{
+        const dataUrl = await readFileAsDataURL(file);
+        document.execCommand('insertHTML', false, buildImageEmbedHtml(dataUrl));
+      }catch(err){}
+    }
+    syncActiveBlockHtml();
+    showToast('이미지를 넣었어요');
+  });
+
   // ---------- dark mode ----------
   const DARK_MODE_KEY = 'tamgu-dark-mode';
   function applyDarkMode(on){
@@ -2251,11 +3968,16 @@
       ['Enter', '같은 칸에서 줄바꿈'],
       ['Enter (빈 줄에서 한번 더)', '새 칸 만들기'],
       ['1. 또는 - 또는 []', '자동으로 번호·글머리·체크박스 목록'],
+      ['- 만 쓰고 Enter', '글머리 목록이 바로 시작되고 다음 줄도 연결돼요'],
+      ['-> , <- , => , <=', '입력하는 순간 화살표(→ ← ⇒ ⇐)로 바뀌어요'],
       ['# / ## / ###', '자동으로 제목 1/2/3'],
       ['Ctrl+B / I / U', '굵게 / 기울임 / 밑줄'],
+      ['Ctrl+K', '모든 워크스페이스의 탭을 빠르게 검색·이동'],
       ['드래그 후 🔗', '링크 삽입'],
+      ['이미지 드래그 앤 드롭', '파일을 노트 위에 끌어다 놓으면 바로 삽입'],
       ['이미지 위 🗑', '이미지 삭제'],
       ['표 안에서 우클릭', '행·열 추가/삭제, 표 삭제'],
+      ['줄 왼쪽 ⧉', '그 줄(문단) 복제'],
     ];
     const body = lines.map(([k,v])=>`<div class="ccp-row" style="display:flex;justify-content:space-between;gap:14px;"><span>${escapeHtml(k)}</span><b>${escapeHtml(v)}</b></div>`).join('');
     const pop = $('#infoPopover');
@@ -2271,7 +3993,7 @@
   // ---------- backup: export / import whole profile as JSON ----------
   $('#backupBtn').addEventListener('click', ()=>{
     if(!profile){ showToast('먼저 로그인해주세요'); return; }
-    const choice = confirm('전체 노트를 JSON 파일로 내보낼까요?\n(취소를 누르면 대신 파일을 불러올 수 있어요)');
+    const choice = confirm('전체 노트(모든 워크스페이스 포함)를 JSON 파일로 내보낼까요?\n(취소를 누르면 대신 파일을 불러올 수 있어요)');
     if(choice){
       const blob = new Blob([JSON.stringify(profile, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -2295,16 +4017,21 @@
     reader.onload = ()=>{
       try{
         const data = JSON.parse(reader.result);
-        if(!data || !Array.isArray(data.tabs)){ showToast('올바른 백업 파일이 아니에요'); return; }
-        if(!confirm('지금 있는 노트에 불러온 탭들을 추가할까요? (기존 내용은 지워지지 않아요)')) return;
-        data.tabs.forEach(t=>{
+        const ws = getActiveWorkspace();
+        if(!ws){ showToast('먼저 워크스페이스를 열어주세요'); return; }
+        let incomingTabs = null;
+        if(data && Array.isArray(data.tabs)) incomingTabs = data.tabs; // legacy single-profile export
+        else if(data && Array.isArray(data.workspaces)) incomingTabs = data.workspaces.flatMap(w=>w.tabs||[]); // full profile export
+        if(!incomingTabs || !incomingTabs.length){ showToast('올바른 백업 파일이 아니에요'); return; }
+        if(!confirm('지금 워크스페이스("' + (ws.name||'') + '")에 불러온 탭 ' + incomingTabs.length + '개를 추가할까요? (기존 내용은 지워지지 않아요)')) return;
+        incomingTabs.forEach(t=>{
           t.id = uid();
           (t.blocks||[]).forEach(b=> b.id = uid());
-          profile.tabs.push(t);
+          ws.tabs.push(t);
         });
         renderTabs(); scheduleSave();
         showToast('불러왔어요');
-      }catch(err){ showToast('파일을 읽지 못했어요'); }
+      }catch(err){ showToast('파일을 읽지 못했어요', true); }
     };
     reader.readAsText(file);
   });
